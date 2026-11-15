@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#050404]">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Boston Drumming — snare, tenor, bass and cymbal lessons in the Boston area and online. Book a session in under a minute.">
+  <meta name="theme-color" content="#100B0B">
+  <title>Boston Drumming</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://images.unsplash.com">
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind Play CDN is fine for prototyping; for production, compile Tailwind to a static CSS file. -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .font-serif-custom { font-family: 'Instrument Serif', serif; }
+    .font-sans-custom  { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    .film-grain {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 0);
+      background-size: 24px 24px;
+    }
+
+    @keyframes slowPan {
+      0%   { transform: scale(1.03) translate(0, 0); }
+      50%  { transform: scale(1.08) translate(-1%, -1%); }
+      100% { transform: scale(1.03) translate(0, 0); }
+    }
+    .animate-bg-pan { animation: slowPan 28s ease-in-out infinite; }
+
+    /* Cross-fade between booking steps */
+    .step-page {
+      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .step-hidden {
+      opacity: 0;
+      transform: translateY(6px) scale(0.99);
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+    }
+    .step-active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      position: relative;
+    }
+
+    .pill-track { touch-action: none; }
+
+    /* Make the native date picker icon visible on the dark background */
+    input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
+    input[type="date"] { color-scheme: dark; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .animate-bg-pan { animation: none; }
+      .step-page, #sliderThumb { transition: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen md:h-screen w-full text-[#F5EFE6] font-sans-custom antialiased md:overflow-hidden p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
+
+  <!-- MAIN EDITORIAL CARD FRAME -->
+  <main class="relative w-full md:h-full max-w-[1300px] md:max-h-[820px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col md:flex-row bg-[#100B0B]">
+
+    <!-- Background photo with gradient fades -->
+    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <img
+        id="bgDrumlineImg"
+        src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=2000&q=85"
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+        class="w-full h-full object-cover object-center opacity-45 sepia-[.2] contrast-125 brightness-90 animate-bg-pan transition-opacity duration-500"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#0C0808]/95 via-[#120D0D]/60 to-transparent"></div>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#0C0808] via-transparent to-[#0C0808]/80"></div>
+      <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-red-600/15 rounded-full blur-[140px]"></div>
+      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[160px]"></div>
+      <div class="absolute inset-0 film-grain"></div>
+    </div>
+
+    <!-- Background switcher -->
+    <div class="absolute top-4 right-5 z-30">
+      <button type="button" id="bgSwitchBtn" class="px-3.5 py-1.5 rounded-full bg-black/50 hover:bg-black/70 border border-red-500/30 text-[10px] font-medium text-red-200/90 backdrop-blur-md transition flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400" aria-label="Switch background photo">
+        <span aria-hidden="true">🥁</span> <span id="bgLabel">Collegiate Line</span>
+      </button>
+    </div>
+
+    <!-- LEFT COLUMN: Intro -->
+    <section class="relative z-10 w-full md:w-5/12 p-6 pt-16 sm:p-10 lg:p-12 flex flex-col justify-between gap-8 md:h-full">
+
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-full bg-[#1C1212] border-2 border-red-500/50 flex items-center justify-center shadow-lg" aria-hidden="true">
+          <span class="text-lg">🥁</span>
+        </div>
+        <div>
+          <span class="text-[10px] uppercase tracking-[0.22em] text-red-400 font-semibold block">Boston &amp; Remote</span>
+          <span class="text-xs text-stone-300/90 font-light">Boston Drumming Coaching</span>
+        </div>
+      </div>
+
+      <div class="md:my-auto py-2">
+        <h1 class="font-serif-custom text-5xl sm:text-6xl lg:text-[72px] text-[#FDFBF7] leading-[0.96] tracking-tight mb-4">
+          Learn,<br>
+          practice,<br>
+          <span class="italic bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(251,191,36,0.35)]">play.</span>
+        </h1>
+
+        <p class="text-sm sm:text-base text-stone-200/90 font-light leading-relaxed max-w-sm mb-6">
+          We learn together as one: I learn from you, and you from me. We’re a community.
+        </p>
+
+        <button type="button" id="exploreBtn" class="px-7 py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs tracking-wide shadow-xl transition transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">
+          Explore my services
+        </button>
+      </div>
+
+      <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
+        <span>✦ Snare / Tenors / Bass / Cymbals</span>
+        <span class="text-red-400/80 font-medium">Boston Drumming</span>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: Booking panel -->
+    <section class="relative z-10 w-full md:w-7/12 p-4 sm:p-8 lg:p-10 flex items-center justify-center md:h-full" aria-labelledby="bookingTitle">
+
+      <div id="bookingPanel" class="w-full max-w-[500px] bg-[#140D0D]/90 border border-red-500/25 rounded-[30px] p-5 sm:p-7 backdrop-blur-xl shadow-2xl transition-all duration-300 flex flex-row gap-3 sm:gap-4 items-stretch scroll-mt-4">
+
+        <div class="flex-1 flex flex-col justify-between min-w-0">
+
+          <!-- Header + step dots -->
+          <div class="flex items-center justify-between border-b border-red-500/15 pb-3 mb-4">
+            <div>
+              <span class="text-[10px] uppercase tracking-[0.2em] text-red-400 font-bold block" id="stepSubtitle" aria-live="polite">Step 1 of 3 • Format</span>
+              <h2 id="bookingTitle" class="font-serif-custom text-2xl sm:text-3xl text-[#FDFBF7] leading-none mt-0.5">Book a session</h2>
+            </div>
+            <nav class="flex items-center gap-1.5" aria-label="Booking steps">
+              <button type="button" data-step-dot="1" class="w-5 h-1.5 rounded-full bg-red-500 transition-all" aria-label="Step 1: Format"></button>
+              <button type="button" data-step-dot="2" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 2: Duration"></button>
+              <button type="button" data-step-dot="3" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 3: Date and contact"></button>
+            </nav>
+          </div>
+
+          <!-- Pages -->
+          <div class="relative min-h-[250px] flex flex-col justify-center">
+
+            <!-- PAGE 1: Format -->
+            <div id="page1" class="step-page step-active space-y-3">
+              <p class="text-xs text-stone-300 font-medium">Choose session format:</p>
+              <div id="formatButtonsContainer" class="space-y-3"></div>
+            </div>
+
+            <!-- PAGE 2: Duration -->
+            <div id="page2" class="step-page step-hidden space-y-3" inert>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-stone-300 font-medium" id="page2FormatTitle">Select session length:</span>
+                <button type="button" data-go="1" class="text-[11px] text-red-400 hover:underline">← Format</button>
+              </div>
+              <div id="rateButtonsContainer" class="space-y-2.5"></div>
+            </div>
+
+            <!-- PAGE 3: Date & contact -->
+            <form id="page3" class="step-page step-hidden space-y-3" inert novalidate>
+              <div class="flex items-center justify-between">
+                <span class="text-xs text-stone-300 font-medium">Pick a date &amp; add your info:</span>
+                <button type="button" data-go="2" class="text-[11px] text-red-400 hover:underline">← Length</button>
+              </div>
+
+              <div>
+                <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
+                <input type="date" id="sessionDateInput" required class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+              </div>
+
+              <div>
+                <label for="clientName" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Your name</label>
+                <input type="text" id="clientName" autocomplete="name" placeholder="Alex Rivera" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div>
+                  <label for="clientEmail" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Email</label>
+                  <input type="email" id="clientEmail" autocomplete="email" inputmode="email" placeholder="student@email.com" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                </div>
+                <div>
+                  <label for="clientPhone" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Phone</label>
+                  <input type="tel" id="clientPhone" autocomplete="tel" inputmode="tel" placeholder="(617) 555-0100" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                </div>
+              </div>
+              <p id="contactHint" class="text-[10px] text-stone-400 -mt-1" aria-live="polite">Email or phone, whichever you prefer.</p>
+
+              <button type="submit" id="submitBtn" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">
+                Pick a date &amp; add email or phone
+              </button>
+              <p id="submitError" class="hidden text-[11px] text-red-300 text-center" role="alert"></p>
+            </form>
+
+            <!-- PAGE 4: Success -->
+            <div id="page4" class="step-page step-hidden space-y-3.5" inert>
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold">✓ Request ready</span>
+                <button type="button" id="bookAnotherBtn" class="text-[11px] text-red-300 underline">Book another</button>
+              </div>
+
+              <dl class="grid grid-cols-2 gap-2 text-xs">
+                <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
+                  <dt class="text-[9px] text-stone-400">Format</dt>
+                  <dd id="outFormat" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                </div>
+                <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
+                  <dt class="text-[9px] text-stone-400">Length &amp; rate</dt>
+                  <dd id="outRate" class="font-bold text-red-300 truncate">-</dd>
+                </div>
+                <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
+                  <dt class="text-[9px] text-stone-400">Instrument focus</dt>
+                  <dd id="outFocus" class="font-bold text-amber-200 truncate">-</dd>
+                </div>
+                <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
+                  <dt class="text-[9px] text-stone-400">Date</dt>
+                  <dd id="outDate" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                </div>
+                <div class="col-span-2 p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
+                  <dt class="text-[9px] text-stone-400">Contact</dt>
+                  <dd id="outContact" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                </div>
+              </dl>
+
+              <p id="successMsg" class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-[11px] text-red-200 text-center font-medium"></p>
+            </div>
+          </div>
+
+          <!-- Instrument focus status -->
+          <div class="pt-3 mt-2 border-t border-red-500/15 flex items-center justify-between text-xs">
+            <span class="text-stone-400">Instrument focus:</span>
+            <span id="focusNameDisplay" class="font-bold text-red-300 tracking-wide">Snare</span>
+          </div>
+        </div>
+
+        <!-- Vertical instrument pill slider -->
+        <div class="w-[68px] sm:w-[74px] flex flex-col items-center justify-between bg-white/[0.03] border border-white/10 rounded-full py-3 px-1.5 pill-track select-none">
+          <button type="button" id="instUpBtn" class="w-7 h-6 rounded-full text-red-300 hover:text-white text-xs flex items-center justify-center transition" aria-label="Previous instrument">▲</button>
+
+          <div
+            id="sliderRail"
+            class="relative flex-1 w-full my-1.5 flex flex-col justify-between items-center rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400"
+            role="slider"
+            tabindex="0"
+            aria-label="Instrument focus"
+            aria-orientation="vertical"
+            aria-valuemin="0"
+            aria-valuemax="3"
+            aria-valuenow="0"
+            aria-valuetext="Snare"
+          >
+            <div id="sliderThumb" class="absolute inset-x-0.5 top-0 h-9 rounded-full bg-gradient-to-r from-red-500 to-amber-500 text-white shadow-[0_2px_12px_rgba(239,68,68,0.4)] flex items-center justify-center transition-transform duration-200 ease-out pointer-events-none z-20" aria-hidden="true">
+              <span id="thumbLabel" class="text-[11px] font-extrabold tracking-tight">Snare</span>
+            </div>
+            <!-- Stops are rendered from the `instruments` array -->
+          </div>
+
+          <button type="button" id="instDownBtn" class="w-7 h-6 rounded-full text-red-300 hover:text-white text-xs flex items-center justify-center transition" aria-label="Next instrument">▼</button>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <script>
+    /* ------------------------------------------------------------------
+     * CONFIG — edit these before going live.
+     * formEndpoint: a form backend (Formspree, Getform, Basin, your own
+     *   API...) that accepts a JSON POST. When set, bookings are sent there.
+     * contactEmail: used as a fallback when no endpoint is set — the
+     *   visitor's mail app opens with the booking details pre-filled.
+     * ------------------------------------------------------------------ */
+    const CONFIG = {
+      formEndpoint: '',
+      contactEmail: 'bookings@example.com',
+    };
+
+    /* ---------------- Data ---------------- */
+    const instruments = ['Snare', 'Tenors', 'Bass', 'Cymbals'];
+
+    const formats = {
+      digital: {
+        icon: '💻',
+        title: 'Digital (Zoom / FaceTime)',
+        label: 'Digital (Zoom/FaceTime)',
+        note: 'Online payment required',
+        noteClass: 'text-red-300/80',
+        page2Title: 'Digital length (online payment):',
+        rates: [
+          { minutes: 30, price: 15 },
+          { minutes: 60, price: 25 },
+          { minutes: 90, price: 35 },
+        ],
+      },
+      inperson: {
+        icon: '🤝',
+        title: 'In-Person (Boston Area)',
+        label: 'In-Person (Boston)',
+        note: 'Pay online or in person',
+        noteClass: 'text-stone-400',
+        page2Title: 'In-person length (Boston area):',
+        rates: [
+          { minutes: 60, price: 35 },
+          { minutes: 90, price: 50, tag: 'Audition Block' },
+        ],
+      },
+    };
+
+    const drumlineBgs = [
+      { label: 'Collegiate Line', url: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=2000&q=85' },
+      { label: 'Stadium View',    url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2000&q=85' },
+    ];
+
+    /* ---------------- State ---------------- */
+    const initialState = () => ({
+      page: 1,
+      format: null,
+      rate: null,
+      instIndex: 0,
+      date: '',
+      name: '',
+      email: '',
+      phone: '',
+    });
+    let state = initialState();
+
+    const $ = (id) => document.getElementById(id);
+
+    /* ---------------- Helpers ---------------- */
+    function todayISO() {
+      const d = new Date();
+      d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // local date, not UTC
+      return d.toISOString().slice(0, 10);
+    }
+
+    function formatDate(iso) {
+      if (!iso) return '';
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+    }
+
+    const isValidEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v);
+    const phoneDigits  = (v) => v.replace(/\D/g, '');
+    const isValidPhone = (v) => { const n = phoneDigits(v).length; return n >= 10 && n <= 15; };
+
+    function formatUSPhone(v) {
+      const d = phoneDigits(v);
+      if (v.trim().startsWith('+') || d.length > 10) return v; // leave international numbers alone
+      if (d.length < 4) return d;
+      if (d.length < 7) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+      return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
+    }
+
+    const rateLabel = (r) => `${r.minutes} min${r.tag ? ` (${r.tag})` : ''}`;
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text != null) node.textContent = text;
+      return node;
+    }
+
+    /* ---------------- Navigation ---------------- */
+    const subtitles = {
+      1: 'Step 1 of 3 • Format',
+      2: 'Step 2 of 3 • Length',
+      3: 'Step 3 of 3 • Date & Contact',
+      4: 'Almost done',
+    };
+
+    function canGoTo(page) {
+      if (page >= 2 && !state.format) return false;
+      if (page >= 3 && !state.rate) return false;
+      return true;
+    }
+
+    function goToPage(page, { focus = true } = {}) {
+      if (!canGoTo(page)) return;
+      state.page = page;
+      $('stepSubtitle').textContent = subtitles[page];
+
+      [1, 2, 3, 4].forEach((n) => {
+        const p = $('page' + n);
+        const active = n === page;
+        p.classList.toggle('step-active', active);
+        p.classList.toggle('step-hidden', !active);
+        p.inert = !active; // keep hidden steps out of the tab order / screen readers
+      });
+
+      document.querySelectorAll('[data-step-dot]').forEach((dot) => {
+        const d = Number(dot.dataset.stepDot);
+        const current = d === page || (page === 4 && d === 3);
+        dot.className = 'h-1.5 rounded-full transition-all ' + (
+          current ? 'w-5 bg-red-500' : d < page ? 'w-2 bg-red-500/50' : 'w-2 bg-white/20'
+        );
+        dot.disabled = !canGoTo(d);
+        dot.style.cursor = dot.disabled ? 'not-allowed' : 'pointer';
+        if (current) dot.setAttribute('aria-current', 'step'); else dot.removeAttribute('aria-current');
+      });
+
+      if (focus) {
+        const first = $('page' + page).querySelector('input, button:not([data-go])');
+        if (first) setTimeout(() => first.focus({ preventScroll: true }), 50);
+      }
+    }
+
+    /* ---------------- Step 1: format ---------------- */
+    function renderFormats() {
+      const container = $('formatButtonsContainer');
+      Object.entries(formats).forEach(([key, f]) => {
+        const from = Math.min(...f.rates.map((r) => r.price));
+        const btn = el('button', 'w-full text-left p-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-red-400/60 transition flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3 group');
+        btn.type = 'button';
+        btn.dataset.format = key;
+
+        const text = el('div', 'min-w-0');
+        text.append(
+          el('span', 'text-sm font-bold text-[#FDFBF7] group-hover:text-red-300 block', `${f.icon} ${f.title}`),
+          el('span', `text-[11px] block mt-0.5 ${f.noteClass}`, f.note),
+        );
+        const price = el('span', 'shrink-0 text-xs font-extrabold text-red-400 bg-red-500/10 px-3 py-1.5 rounded-full border border-red-500/25', `From $${from} →`);
+        btn.append(text, price);
+        btn.addEventListener('click', () => chooseFormat(key));
+        container.append(btn);
+      });
+    }
+
+    function chooseFormat(key) {
+      const f = formats[key];
+      state.format = key;
+      state.rate = null;
+
+      document.querySelectorAll('[data-format]').forEach((b) => {
+        const on = b.dataset.format === key;
+        b.classList.toggle('border-red-400', on);
+        b.classList.toggle('bg-red-500/10', on);
+        b.setAttribute('aria-pressed', on);
+      });
+
+      $('page2FormatTitle').textContent = f.page2Title;
+      const container = $('rateButtonsContainer');
+      container.replaceChildren();
+      f.rates.forEach((r) => {
+        const btn = el('button', 'rate-btn w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:border-red-400 transition flex items-center justify-between gap-3');
+        btn.type = 'button';
+        btn.setAttribute('aria-pressed', 'false');
+        btn.append(
+          el('span', 'text-xs font-bold text-white text-left', rateLabel(r)),
+          el('span', 'shrink-0 text-sm font-extrabold text-red-300', `$${r.price} →`),
+        );
+        btn.addEventListener('click', () => chooseRate(r, btn));
+        container.append(btn);
+      });
+
+      updateSubmitState();
+      goToPage(2);
+    }
+
+    /* ---------------- Step 2: length ---------------- */
+    function chooseRate(rate, btn) {
+      state.rate = rate;
+      document.querySelectorAll('.rate-btn').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('border-red-400', on);
+        b.classList.toggle('bg-red-500/20', on);
+        b.setAttribute('aria-pressed', on);
+      });
+      updateSubmitState();
+      setTimeout(() => goToPage(3), 120);
+    }
+
+    /* ---------------- Step 3: date & contact ---------------- */
+    function readContact() {
+      state.date  = $('sessionDateInput').value;
+      state.name  = $('clientName').value.trim();
+      state.email = $('clientEmail').value.trim();
+      state.phone = $('clientPhone').value.trim();
+    }
+
+    function contactProblem() {
+      const { email, phone } = state;
+      if (!email && !phone) return 'Add an email or phone number so I can reach you.';
+      if (email && !isValidEmail(email)) return 'That email doesn’t look quite right.';
+      if (phone && !isValidPhone(phone)) return 'Phone numbers need at least 10 digits.';
+      return null;
+    }
+
+    function updateSubmitState() {
+      readContact();
+      const btn = $('submitBtn');
+      const hint = $('contactHint');
+      const problem = contactProblem();
+      const dateOk = state.date && state.date >= todayISO();
+      const touched = state.email || state.phone;
+
+      hint.textContent = touched && problem ? problem : 'Email or phone, whichever you prefer.';
+      hint.classList.toggle('text-red-300', Boolean(touched && problem));
+      hint.classList.toggle('text-stone-400', !(touched && problem));
+
+      const ready = state.format && state.rate && dateOk && !problem;
+      btn.disabled = !ready;
+      btn.textContent = ready
+        ? `Request ${formatDate(state.date)} • $${state.rate.price}`
+        : !dateOk ? 'Pick a date to continue' : 'Add email or phone to continue';
+    }
+
+    function bookingSummary() {
+      const f = formats[state.format];
+      return {
+        format: f.label,
+        payment: f.note,
+        length: rateLabel(state.rate),
+        price: `$${state.rate.price}`,
+        instrument: instruments[state.instIndex],
+        date: state.date,
+        name: state.name,
+        email: state.email,
+        phone: state.phone,
+      };
+    }
+
+    async function submitBooking(e) {
+      e.preventDefault();
+      updateSubmitState();
+      if ($('submitBtn').disabled) return;
+
+      const data = bookingSummary();
+      const btn = $('submitBtn');
+      const err = $('submitError');
+      err.classList.add('hidden');
+
+      let message;
+      if (CONFIG.formEndpoint) {
+        btn.disabled = true;
+        btn.textContent = 'Sending…';
+        try {
+          const res = await fetch(CONFIG.formEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(data),
+          });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          message = '🎉 Request received! Boston Drumming will reach out to you shortly.';
+        } catch (_) {
+          err.textContent = 'Couldn’t send your request. Check your connection and try again.';
+          err.classList.remove('hidden');
+          updateSubmitState();
+          return;
+        }
+      } else {
+        const details = [
+          `Format: ${data.format} (${data.payment})`,
+          `Length: ${data.length} — ${data.price}`,
+          `Instrument focus: ${data.instrument}`,
+          `Preferred date: ${formatDate(data.date)} (${data.date})`,
+          data.name  && `Name: ${data.name}`,
+          data.email && `Email: ${data.email}`,
+          data.phone && `Phone: ${data.phone}`,
+        ].filter(Boolean);
+        const lines = ['Hi! I’d like to book a drumming session.', '', ...details];
+        const subject = `Lesson request: ${data.instrument}, ${formatDate(data.date)}`;
+        window.location.href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\n'))}`;
+        message = `📨 Your email app should open with these details. Hit send to finish, or email ${CONFIG.contactEmail} directly.`;
+      }
+
+      $('outFormat').textContent  = data.format;
+      $('outRate').textContent    = `${data.length} • ${data.price}`;
+      $('outFocus').textContent   = data.instrument;
+      $('outDate').textContent    = formatDate(data.date);
+      $('outContact').textContent = [data.name, data.email, data.phone].filter(Boolean).join(' • ');
+      $('successMsg').textContent = message;
+      goToPage(4);
+    }
+
+    function resetBooking() {
+      const keepInst = state.instIndex;
+      state = initialState();
+      state.instIndex = keepInst;
+      $('page3').reset();
+      $('sessionDateInput').min = todayISO();
+      $('submitError').classList.add('hidden');
+      $('rateButtonsContainer').replaceChildren();
+      document.querySelectorAll('[data-format]').forEach((b) => {
+        b.classList.remove('border-red-400', 'bg-red-500/10');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      updateSubmitState();
+      goToPage(1);
+    }
+
+    /* ---------------- Instrument slider ---------------- */
+    const rail = $('sliderRail');
+    const thumb = $('sliderThumb');
+    let stopButtons = [];
+
+    function renderInstrumentStops() {
+      stopButtons = instruments.map((name, i) => {
+        const b = el('button', 'inst-stop relative z-10 w-full h-9 flex items-center justify-center rounded-full text-[11px] font-medium text-stone-400 hover:text-stone-200 transition', name);
+        b.type = 'button';
+        b.tabIndex = -1; // the rail itself is the single keyboard stop
+        b.addEventListener('click', () => setInstrumentStop(i));
+        rail.append(b);
+        return b;
+      });
+    }
+
+    function positionThumb() {
+      const stop = stopButtons[state.instIndex];
+      if (stop) thumb.style.transform = `translateY(${stop.offsetTop}px)`;
+    }
+
+    function setInstrumentStop(index) {
+      const i = Math.max(0, Math.min(instruments.length - 1, index));
+      state.instIndex = i;
+      const name = instruments[i];
+      positionThumb();
+      $('thumbLabel').textContent = name;
+      $('focusNameDisplay').textContent = name;
+      rail.setAttribute('aria-valuenow', i);
+      rail.setAttribute('aria-valuetext', name);
+      $('instUpBtn').disabled = i === 0;
+      $('instDownBtn').disabled = i === instruments.length - 1;
+      $('instUpBtn').classList.toggle('opacity-30', i === 0);
+      $('instDownBtn').classList.toggle('opacity-30', i === instruments.length - 1);
+    }
+
+    function initSlider() {
+      renderInstrumentStops();
+      let dragging = false;
+
+      const nearestStop = (clientY) => {
+        let best = 0, bestDist = Infinity;
+        stopButtons.forEach((b, i) => {
+          const r = b.getBoundingClientRect();
+          const dist = Math.abs(clientY - (r.top + r.height / 2));
+          if (dist < bestDist) { bestDist = dist; best = i; }
+        });
+        return best;
+      };
+
+      rail.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        rail.setPointerCapture(e.pointerId);
+        setInstrumentStop(nearestStop(e.clientY));
+      });
+      rail.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const i = nearestStop(e.clientY);
+        if (i !== state.instIndex) setInstrumentStop(i);
+      });
+      const stop = () => { dragging = false; };
+      rail.addEventListener('pointerup', stop);
+      rail.addEventListener('pointercancel', stop);
+
+      rail.addEventListener('keydown', (e) => {
+        const map = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 };
+        if (e.key in map) { e.preventDefault(); setInstrumentStop(state.instIndex + map[e.key]); }
+        else if (e.key === 'Home') { e.preventDefault(); setInstrumentStop(0); }
+        else if (e.key === 'End')  { e.preventDefault(); setInstrumentStop(instruments.length - 1); }
+      });
+
+      $('instUpBtn').addEventListener('click', () => setInstrumentStop(state.instIndex - 1));
+      $('instDownBtn').addEventListener('click', () => setInstrumentStop(state.instIndex + 1));
+
+      // Keep the thumb aligned when the panel resizes (rotation, window resize, font load)
+      new ResizeObserver(positionThumb).observe(rail);
+      setInstrumentStop(0);
+    }
+
+    /* ---------------- Background switcher ---------------- */
+    let bgIndex = 0;
+    // Preload the alternates so swapping doesn't flash an empty frame
+    drumlineBgs.slice(1).forEach((bg) => { new Image().src = bg.url; });
+
+    function cycleDrumlineBg() {
+      bgIndex = (bgIndex + 1) % drumlineBgs.length;
+      const next = drumlineBgs[bgIndex];
+      const img = $('bgDrumlineImg');
+      img.style.opacity = '0.1';
+      const loader = new Image();
+      loader.onload = loader.onerror = () => {
+        setTimeout(() => {
+          img.src = next.url;
+          img.style.opacity = '';
+          $('bgLabel').textContent = next.label;
+        }, 250);
+      };
+      loader.src = next.url;
+    }
+
+    /* ---------------- Explore button ---------------- */
+    function highlightServices() {
+      goToPage(1);
+      const panel = $('bookingPanel');
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      panel.classList.add('ring-2', 'ring-red-500/60');
+      setTimeout(() => panel.classList.remove('ring-2', 'ring-red-500/60'), 900);
+    }
+
+    /* ---------------- Wire up ---------------- */
+    renderFormats();
+    initSlider();
+    $('sessionDateInput').min = todayISO();
+
+    document.querySelectorAll('[data-go]').forEach((b) =>
+      b.addEventListener('click', () => goToPage(Number(b.dataset.go))));
+    document.querySelectorAll('[data-step-dot]').forEach((b) =>
+      b.addEventListener('click', () => goToPage(Number(b.dataset.stepDot))));
+
+    ['sessionDateInput', 'clientName', 'clientEmail', 'clientPhone'].forEach((id) =>
+      $(id).addEventListener('input', updateSubmitState));
+    $('clientPhone').addEventListener('blur', (e) => { e.target.value = formatUSPhone(e.target.value); updateSubmitState(); });
+
+    $('page3').addEventListener('submit', submitBooking);
+    $('bookAnotherBtn').addEventListener('click', resetBooking);
+    $('bgSwitchBtn').addEventListener('click', cycleDrumlineBg);
+    $('exploreBtn').addEventListener('click', highlightServices);
+
+    updateSubmitState();
+    goToPage(1, { focus: false });
+  </script>
+</body>
+</html>
