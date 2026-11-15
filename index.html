@@ -130,7 +130,7 @@
     </div>
 
     <!-- LEFT COLUMN: Intro -->
-    <section class="relative z-10 w-full md:w-5/12 p-6 pt-16 sm:p-10 lg:p-12 flex flex-col justify-between gap-8 md:h-full">
+    <section class="relative z-10 w-full md:w-5/12 p-6 pt-16 sm:p-10 lg:p-12 flex flex-col justify-between gap-8 md:h-full md:overflow-y-auto [@media(min-width:768px)_and_(max-height:820px)]:py-7 [@media(min-width:768px)_and_(max-height:820px)]:gap-4">
 
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-full bg-[#1C1212] border-2 border-red-500/50 flex items-center justify-center shadow-lg" aria-hidden="true">
@@ -143,15 +143,28 @@
       </div>
 
       <div class="md:my-auto py-2">
-        <h1 class="font-serif-custom text-5xl sm:text-6xl lg:text-[72px] text-[#FDFBF7] leading-[0.96] tracking-tight mb-4">
+        <h1 class="font-serif-custom text-5xl sm:text-6xl md:text-[clamp(44px,8vh,72px)] text-[#FDFBF7] leading-[0.96] tracking-tight mb-4">
           Learn,<br>
           practice,<br>
           <span class="italic bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(251,191,36,0.35)]">play.</span>
         </h1>
 
-        <p class="text-sm sm:text-base text-stone-200/90 font-light leading-relaxed max-w-sm mb-6">
+        <p class="text-sm sm:text-base text-stone-200/90 font-light leading-relaxed max-w-sm mb-4">
           We learn together as one: I learn from you, and you from me. We’re a community.
         </p>
+
+        <div id="about" class="max-w-md mb-5 p-4 rounded-2xl bg-black/35 border border-white/10 backdrop-blur-sm">
+          <h2 class="text-[10px] uppercase tracking-[0.2em] text-red-400 font-semibold">About me</h2>
+          <p class="mt-1.5 text-[13px] text-stone-200/90 font-light leading-relaxed">
+            I’ve been marching for 3 years, training with the bands at Alabama State University and Florida A&amp;M University and taking part in their band camps. I bring what I learned there to every lesson.
+          </p>
+          <ul class="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium [@media(min-width:768px)_and_(max-height:720px)]:hidden">
+            <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">3 years marching</li>
+            <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">Alabama State</li>
+            <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">Florida A&amp;M</li>
+            <li class="px-2.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-200">🗓 Weekends · Weekdays after 5 PM</li>
+          </ul>
+        </div>
 
         <button type="button" id="exploreBtn" class="px-7 py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs tracking-wide shadow-xl transition transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">
           Explore my services
@@ -211,7 +224,8 @@
 
               <div>
                 <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
-                <input type="date" id="sessionDateInput" required class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                <p id="availHint" class="mt-1 text-[10px] text-stone-400">Weekends: any time · Weekdays: after 5:00 PM</p>
               </div>
 
               <div role="group" aria-labelledby="timeLabel">
@@ -341,7 +355,9 @@
 
     /* ---------------- Data ---------------- */
     const instruments = ['Snare', 'Tenors', 'Bass', 'Cymbals'];
-    const timesOfDay = ['Any', 'Morning', 'Afternoon', 'Evening'];
+    // Availability: weekends any time, weekdays only after 5 PM
+    const WEEKEND_TIMES = ['Any', 'Morning', 'Afternoon', 'Evening'];
+    const WEEKDAY_TIMES = ['After 5 PM'];
     const STORAGE_KEY = 'bd-contact';
 
     const formats = {
@@ -550,8 +566,24 @@
       state.notes = $('clientNotes').value.trim();
     }
 
+    function isWeekend(iso) {
+      const [y, m, d] = iso.split('-').map(Number);
+      const day = new Date(y, m - 1, d).getDay();
+      return day === 0 || day === 6;
+    }
+
+    function timesForDate(iso) {
+      return !iso || isWeekend(iso) ? WEEKEND_TIMES : WEEKDAY_TIMES;
+    }
+
     function renderTimeChips() {
-      $('timeChips').replaceChildren(...timesOfDay.map((t) => {
+      const iso = $('sessionDateInput').value;
+      const times = timesForDate(iso);
+      if (!times.includes(state.time)) state.time = times[0];
+      const weekday = times === WEEKDAY_TIMES;
+      $('timeLabel').textContent = weekday ? 'Time (weekdays are after 5 PM)' : 'Time of day';
+      $('timeChips').className = weekday ? 'grid grid-cols-1 gap-1.5' : 'grid grid-cols-2 sm:grid-cols-4 gap-1.5';
+      $('timeChips').replaceChildren(...times.map((t) => {
         const b = el('button', '', t);
         b.type = 'button';
         b.dataset.time = t;
@@ -710,7 +742,7 @@
       $('sessionDateInput').min = todayISO();
       $('rememberMe').checked = true;
       loadSavedContact();
-      syncTimeChips();
+      renderTimeChips();
       setNoteOpen(false);
       $('submitError').classList.add('hidden');
       $('rateButtonsContainer').replaceChildren();
@@ -838,6 +870,7 @@
     loadSavedContact();
     $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;
     $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
+    $('sessionDateInput').addEventListener('input', renderTimeChips);
 
     document.querySelectorAll('[data-go]').forEach((b) =>
       b.addEventListener('click', () => goToPage(Number(b.dataset.go))));
