@@ -103,7 +103,6 @@
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
-  <!-- MAIN EDITORIAL CARD FRAME -->
   <!-- Cancellation & refund policy (opened from the footer and the booking form) -->
   <dialog id="policyDialog" aria-labelledby="policyTitle" class="w-[calc(100%-2rem)] max-w-md p-0 rounded-3xl bg-[#140D0D] text-[#F5EFE6] border border-red-500/30 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
     <div class="p-6 sm:p-7 space-y-4">
@@ -130,6 +129,7 @@
     <button type="button" id="paidBannerClose" class="text-emerald-200 hover:text-white text-base leading-none" aria-label="Dismiss">×</button>
   </div>
 
+  <!-- MAIN CARD -->
   <main data-theme="ember" class="relative w-full max-w-[1300px] lg:min-h-[min(820px,calc(100vh-4rem))] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col lg:flex-row bg-[#100B0B]">
 
     <!-- Animated gradient-wave background -->
@@ -596,7 +596,7 @@
         dot.className = 'h-1.5 rounded-full transition-all ' + (
           current ? 'w-5 bg-red-500' : d < page ? 'w-2 bg-red-500/50' : 'w-2 bg-white/20'
         );
-        dot.disabled = !canGoTo(d);
+        dot.disabled = page === 4 || !canGoTo(d); // "Book another" starts a fresh booking
         dot.style.cursor = dot.disabled ? 'not-allowed' : 'pointer';
         if (current) dot.setAttribute('aria-current', 'step'); else dot.removeAttribute('aria-current');
       });
@@ -604,6 +604,12 @@
       if (focus) {
         const first = $('page' + page).querySelector('input, button:not([data-go])');
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 50);
+        // If the top of the booking box is now above the screen, bring it back into view
+        const panel = $('bookingPanel');
+        if (panel.getBoundingClientRect().top < 0) {
+          const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          panel.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        }
       }
     }
 
@@ -841,6 +847,8 @@
         const hits = await fetchJson('https://nominatim.openstreetmap.org/search?' + q);
         if (hits[0]) point = [Number(hits[0].lat), Number(hits[0].lon)];
       } catch (_) { /* fall back below */ }
+      // A match more than 15 miles from the ZIP's centre is probably the wrong place; use the ZIP instead
+      if (point && zipCentre && straightMiles(point, zipCentre) > 15) point = null;
       if (!point && !zipCentre) return { far: true, miles: null, method: 'zip' }; // ZIP far outside the area
       const target = point || zipCentre;
       // 2) driving distance along roads
@@ -880,7 +888,7 @@
       if (travel.status === 'far') {
         box.replaceChildren(
           el('span', '', travel.miles
-            ? `🚫 That’s about ${Math.round(travel.miles)} miles away. I travel up to ${TRAVEL.maxMiles} miles. `
+            ? `🚫 That’s about ${travel.miles.toFixed(1)} miles away. I travel up to ${TRAVEL.maxMiles} miles. `
             : `🚫 That ZIP code is outside my ${TRAVEL.maxMiles}-mile travel area. `),
         );
         const sw = el('button', 'underline font-semibold text-white', 'Book a digital lesson instead');
@@ -895,7 +903,7 @@
       const { street, city, zip } = state;
       const ready = street.length >= 4 && city && isValidZip(zip);
       const key = [street, city, zip.slice(0, 5)].join('|').toLowerCase();
-      if (!ready) { travel = { status: 'idle' }; renderTravel(); return; }
+      if (!ready) { travelSeq++; clearTimeout(travelTimer); travel = { status: 'idle' }; renderTravel(); return; }
       if (travel.key === key && travel.status !== 'idle') return;
       clearTimeout(travelTimer);
       if (travelCache.has(key)) { travel = travelCache.get(key); renderTravel(); updateSubmitState(); return; }
@@ -1239,10 +1247,17 @@
       b.addEventListener('click', () => { state.pay = b.dataset.pay; syncPayChoice(); }));
     $('paidBannerClose').addEventListener('click', () => { $('paidBanner').hidden = true; });
     document.querySelectorAll('[data-open-policy]').forEach((b) =>
-      b.addEventListener('click', () => $('policyDialog').showModal()));
-    ['policyClose', 'policyOk'].forEach((id) => $(id).addEventListener('click', () => $('policyDialog').close()));
+      b.addEventListener('click', () => {
+        const d = $('policyDialog');
+        if (typeof d.showModal === 'function') { d.showModal(); return; }
+        // Older browsers: show it pinned on top of the page instead
+        Object.assign(d.style, { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: '100', margin: '0', maxHeight: '90vh', overflow: 'auto' });
+        d.setAttribute('open', '');
+      }));
+    const closePolicy = () => { const d = $('policyDialog'); if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); };
+    ['policyClose', 'policyOk'].forEach((id) => $(id).addEventListener('click', closePolicy));
     // Close when tapping the dark area around the dialog
-    $('policyDialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+    $('policyDialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) closePolicy(); });
     syncPayChoice();
     showPaidBannerIfReturning();
 
