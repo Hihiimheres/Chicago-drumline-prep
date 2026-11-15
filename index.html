@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-15.6">
+  <meta name="site-version" content="2026-11-15.7">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" href="brand/logo-mark.png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
@@ -157,6 +157,11 @@
     .pill-track { touch-action: none; }
     [hidden] { display: none !important; }
 
+    /* Phones: the page runs edge to edge, so pad for the notch and the home-bar area */
+    @media (max-width: 639px) {
+      main { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
+    }
+
     /* Make the native date picker icon visible on the dark background */
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
     input[type="date"] { color-scheme: dark; min-width: 0; }
@@ -174,9 +179,9 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.6">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.7">
 </head>
-<body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
+<body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
   <!-- Cancellation & refund policy (opened from the footer and the booking form) -->
   <dialog id="policyDialog" aria-labelledby="policyTitle" class="w-[calc(100%-2rem)] max-w-md p-0 rounded-3xl bg-[#140D0D] text-[#F5EFE6] border border-red-500/30 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
@@ -240,7 +245,7 @@
   </div>
 
   <!-- MAIN CARD -->
-  <main data-theme="ember" class="relative w-full max-w-[1300px] lg:min-h-[min(820px,calc(100vh-4rem))] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col lg:flex-row bg-[#100B0B]">
+  <main data-theme="ember" class="relative w-full max-w-[1300px] min-h-[100svh] sm:min-h-0 lg:min-h-[min(820px,calc(100vh-4rem))] rounded-none sm:rounded-[36px] overflow-hidden border-0 sm:border sm:border-red-500/20 shadow-2xl flex flex-col lg:flex-row bg-[#100B0B]">
 
     <!-- Animated gradient-wave background -->
     <div class="bg-waves absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
