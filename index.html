@@ -155,7 +155,10 @@
     <section class="relative z-10 w-full lg:w-5/12 p-6 pt-16 sm:p-10 sm:pt-16 lg:p-12 flex flex-col justify-between gap-8 [@media(min-width:1024px)_and_(max-height:820px)]:py-8 [@media(min-width:1024px)_and_(max-height:820px)]:gap-5">
 
       <div class="flex items-center gap-3">
-        <img src="brand/logo-mark.svg" alt="Boston Drumming logo" width="48" height="48" class="w-12 h-12 shrink-0 drop-shadow-[0_4px_14px_rgba(239,68,68,0.35)]">
+        <picture class="shrink-0">
+          <source srcset="brand/logo-mark.svg" media="(prefers-reduced-motion: reduce)">
+          <img src="brand/logo-mark-animated.svg" alt="Boston Drumming logo" width="48" height="48" class="w-12 h-12 shrink-0 drop-shadow-[0_4px_14px_rgba(239,68,68,0.35)]">
+        </picture>
         <div>
           <span class="text-[10px] uppercase tracking-[0.22em] text-red-400 font-semibold block">Boston Drumming Co.</span>
           <span class="text-xs text-stone-300/90 font-light">Drumming, coaching, and fun.</span>
