@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Boston Drumming — snare, tenor, bass and cymbal lessons in the Boston area and online. Book a session in under a minute.">
   <meta name="theme-color" content="#100B0B">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥁</text></svg>">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Boston Drumming — Learn, practice, play.">
+  <meta property="og:description" content="Snare, tenor, bass and cymbal lessons in Boston and online. Book a session in under a minute.">
+  <meta property="og:url" content="https://hihiimheres.github.io/Chicago-drumline-prep/">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=1200&h=630&q=80">
+  <meta name="twitter:card" content="summary_large_image">
   <title>Boston Drumming</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -120,14 +127,14 @@
 
       <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
         <span>✦ Snare / Tenors / Bass / Cymbals</span>
-        <span class="text-red-400/80 font-medium">Boston Drumming</span>
+        <a id="questionsLink" href="mailto:Boston.drumming@icloud.com" class="text-red-400/90 font-medium hover:text-red-300 hover:underline">Questions? Email me →</a>
       </div>
     </section>
 
     <!-- RIGHT COLUMN: Booking panel -->
-    <section class="relative z-10 w-full md:w-7/12 p-4 sm:p-8 lg:p-10 flex items-center justify-center md:h-full" aria-labelledby="bookingTitle">
+    <section class="relative z-10 w-full md:w-7/12 p-4 sm:p-8 lg:p-10 flex justify-center md:h-full md:overflow-y-auto" aria-labelledby="bookingTitle">
 
-      <div id="bookingPanel" class="w-full max-w-[500px] bg-[#140D0D]/90 border border-red-500/25 rounded-[30px] p-5 sm:p-7 backdrop-blur-xl shadow-2xl transition-all duration-300 flex flex-row gap-3 sm:gap-4 items-stretch scroll-mt-4">
+      <div id="bookingPanel" class="my-auto w-full max-w-[500px] bg-[#140D0D]/90 border border-red-500/25 rounded-[30px] p-5 sm:p-7 backdrop-blur-xl shadow-2xl transition-all duration-300 flex flex-row gap-3 sm:gap-4 items-stretch scroll-mt-4">
 
         <div class="flex-1 flex flex-col justify-between min-w-0">
 
@@ -165,31 +172,50 @@
             <!-- PAGE 3: Date & contact -->
             <form id="page3" class="step-page step-hidden space-y-3" inert novalidate>
               <div class="flex items-center justify-between">
-                <span class="text-xs text-stone-300 font-medium">Pick a date &amp; add your info:</span>
-                <button type="button" data-go="2" class="text-[11px] text-red-400 hover:underline">← Length</button>
+                <span id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug min-w-0">—</span>
+                <button type="button" data-go="2" class="shrink-0 ml-2 text-[11px] text-red-400 hover:underline">← Change</button>
               </div>
 
               <div>
                 <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
-                <input type="date" id="sessionDateInput" required class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                <input type="date" id="sessionDateInput" required class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+              </div>
+
+              <div role="group" aria-labelledby="timeLabel">
+                <span id="timeLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Time of day</span>
+                <div id="timeChips" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5"></div>
               </div>
 
               <div>
                 <label for="clientName" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Your name</label>
-                <input type="text" id="clientName" autocomplete="name" placeholder="Alex Rivera" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                <input type="text" id="clientName" autocomplete="name" placeholder="Alex Rivera" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 <div>
                   <label for="clientEmail" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Email</label>
-                  <input type="email" id="clientEmail" autocomplete="email" inputmode="email" placeholder="student@email.com" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                  <input type="email" id="clientEmail" autocomplete="email" inputmode="email" placeholder="student@email.com" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
                 </div>
                 <div>
                   <label for="clientPhone" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Phone</label>
-                  <input type="tel" id="clientPhone" autocomplete="tel" inputmode="tel" placeholder="(617) 555-0100" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                  <input type="tel" id="clientPhone" autocomplete="tel" inputmode="tel" placeholder="(617) 555-0100" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
                 </div>
               </div>
-              <p id="contactHint" class="text-[10px] text-stone-400 -mt-1" aria-live="polite">Email or phone, whichever you prefer.</p>
+              <div class="flex items-start justify-between gap-2 -mt-1">
+                <p id="contactHint" class="text-[10px] text-stone-400" aria-live="polite">Email or phone, whichever you prefer.</p>
+                <label class="shrink-0 flex items-center gap-1.5 text-[10px] text-stone-400 cursor-pointer">
+                  <input type="checkbox" id="rememberMe" checked class="accent-red-500 w-3 h-3"> Remember me
+                </label>
+              </div>
+
+              <div>
+                <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-[11px] text-red-300 hover:underline">+ Add a note (experience, goals, audition date)</button>
+                <label for="clientNotes" class="sr-only">Note for your coach</label>
+                <textarea id="clientNotes" rows="2" maxlength="500" hidden placeholder="e.g. 2 years on snare, auditioning for a college line in March" class="mt-1 w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none resize-none"></textarea>
+              </div>
+
+              <!-- Spam trap: hidden from people, bots tend to fill it in -->
+              <input type="text" id="hpField" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
               <button type="submit" id="submitBtn" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">
                 Pick a date &amp; add email or phone
@@ -218,7 +244,7 @@
                   <dd id="outFocus" class="font-bold text-amber-200 truncate">-</dd>
                 </div>
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
-                  <dt class="text-[9px] text-stone-400">Date</dt>
+                  <dt class="text-[9px] text-stone-400">Date &amp; time</dt>
                   <dd id="outDate" class="font-bold text-[#FDFBF7] truncate">-</dd>
                 </div>
                 <div class="col-span-2 p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
@@ -282,6 +308,8 @@
 
     /* ---------------- Data ---------------- */
     const instruments = ['Snare', 'Tenors', 'Bass', 'Cymbals'];
+    const timesOfDay = ['Any', 'Morning', 'Afternoon', 'Evening'];
+    const STORAGE_KEY = 'bd-contact';
 
     const formats = {
       digital: {
@@ -323,6 +351,8 @@
       rate: null,
       instIndex: 0,
       date: '',
+      time: 'Any',
+      notes: '',
       name: '',
       email: '',
       phone: '',
@@ -464,6 +494,7 @@
     /* ---------------- Step 2: length ---------------- */
     function chooseRate(rate, btn) {
       state.rate = rate;
+      $('choiceSummary').textContent = `${formats[state.format].label} • ${rateLabel(rate)} • $${rate.price}`;
       document.querySelectorAll('.rate-btn').forEach((b) => {
         const on = b === btn;
         b.classList.toggle('border-red-400', on);
@@ -480,6 +511,55 @@
       state.name  = $('clientName').value.trim();
       state.email = $('clientEmail').value.trim();
       state.phone = $('clientPhone').value.trim();
+      state.notes = $('clientNotes').value.trim();
+    }
+
+    function renderTimeChips() {
+      $('timeChips').replaceChildren(...timesOfDay.map((t) => {
+        const b = el('button', '', t);
+        b.type = 'button';
+        b.dataset.time = t;
+        b.addEventListener('click', () => { state.time = t; syncTimeChips(); });
+        return b;
+      }));
+      syncTimeChips();
+    }
+
+    function syncTimeChips() {
+      document.querySelectorAll('[data-time]').forEach((b) => {
+        const on = b.dataset.time === state.time;
+        b.className = 'py-1.5 rounded-lg border text-[11px] font-semibold transition ' +
+          (on ? 'border-red-400 bg-red-500/20 text-white' : 'border-white/10 bg-white/[0.03] text-stone-400 hover:text-stone-200');
+        b.setAttribute('aria-pressed', on);
+      });
+    }
+
+    function setNoteOpen(open) {
+      $('clientNotes').hidden = !open;
+      $('noteToggle').setAttribute('aria-expanded', open);
+      $('noteToggle').textContent = open ? '− Hide note' : '+ Add a note (experience, goals, audition date)';
+      if (open) $('clientNotes').focus();
+    }
+
+    /* Remember contact details on this device only (the page works fine without it) */
+    function loadSavedContact() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!saved) return;
+        [['name', 'clientName'], ['email', 'clientEmail'], ['phone', 'clientPhone']].forEach(([k, id]) => {
+          if (saved[k] && !$(id).value) $(id).value = saved[k];
+        });
+      } catch (_) {}
+    }
+
+    function saveContact() {
+      try {
+        if ($('rememberMe').checked) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ name: state.name, email: state.email, phone: state.phone }));
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (_) {}
     }
 
     function contactProblem() {
@@ -518,9 +598,11 @@
         price: `$${state.rate.price}`,
         instrument: instruments[state.instIndex],
         date: state.date,
+        time: state.time === 'Any' ? 'Any time' : state.time,
         name: state.name,
         email: state.email,
         phone: state.phone,
+        notes: state.notes,
       };
     }
 
@@ -530,6 +612,7 @@
       if ($('submitBtn').disabled) return;
 
       const data = bookingSummary();
+      saveContact();
       const btn = $('submitBtn');
       const err = $('submitError');
       err.classList.add('hidden');
@@ -545,6 +628,7 @@
             // Drop empty fields (Formspree rejects an empty `email`) and add a readable subject line
             body: JSON.stringify({
               ...Object.fromEntries(Object.entries(data).filter(([, v]) => v)),
+              ...($('hpField').value ? { _gotcha: $('hpField').value } : {}),
               _subject: `Lesson request: ${data.instrument}, ${formatDate(data.date)}`,
             }),
           });
@@ -561,10 +645,11 @@
           `Format: ${data.format} (${data.payment})`,
           `Length: ${data.length} — ${data.price}`,
           `Instrument focus: ${data.instrument}`,
-          `Preferred date: ${formatDate(data.date)} (${data.date})`,
+          `Preferred date: ${formatDate(data.date)} (${data.date}), ${data.time}`,
           data.name  && `Name: ${data.name}`,
           data.email && `Email: ${data.email}`,
           data.phone && `Phone: ${data.phone}`,
+          data.notes && `Note: ${data.notes}`,
         ].filter(Boolean);
         const lines = ['Hi! I’d like to book a drumming session.', '', ...details];
         const subject = `Lesson request: ${data.instrument}, ${formatDate(data.date)}`;
@@ -575,7 +660,7 @@
       $('outFormat').textContent  = data.format;
       $('outRate').textContent    = `${data.length} • ${data.price}`;
       $('outFocus').textContent   = data.instrument;
-      $('outDate').textContent    = formatDate(data.date);
+      $('outDate').textContent    = `${formatDate(data.date)} • ${data.time}`;
       $('outContact').textContent = [data.name, data.email, data.phone].filter(Boolean).join(' • ');
       $('successMsg').textContent = message;
       goToPage(4);
@@ -587,6 +672,10 @@
       state.instIndex = keepInst;
       $('page3').reset();
       $('sessionDateInput').min = todayISO();
+      $('rememberMe').checked = true;
+      loadSavedContact();
+      syncTimeChips();
+      setNoteOpen(false);
       $('submitError').classList.add('hidden');
       $('rateButtonsContainer').replaceChildren();
       document.querySelectorAll('[data-format]').forEach((b) => {
@@ -712,13 +801,17 @@
     renderFormats();
     initSlider();
     $('sessionDateInput').min = todayISO();
+    renderTimeChips();
+    loadSavedContact();
+    $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;
+    $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
 
     document.querySelectorAll('[data-go]').forEach((b) =>
       b.addEventListener('click', () => goToPage(Number(b.dataset.go))));
     document.querySelectorAll('[data-step-dot]').forEach((b) =>
       b.addEventListener('click', () => goToPage(Number(b.dataset.stepDot))));
 
-    ['sessionDateInput', 'clientName', 'clientEmail', 'clientPhone'].forEach((id) =>
+    ['sessionDateInput', 'clientName', 'clientEmail', 'clientPhone', 'clientNotes'].forEach((id) =>
       $(id).addEventListener('input', updateSubmitState));
     $('clientPhone').addEventListener('blur', (e) => { e.target.value = formatUSPhone(e.target.value); updateSubmitState(); });
 
