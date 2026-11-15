@@ -75,33 +75,27 @@
       .wave-3 { height: 200px; width: 400%; }
     }
 
-    /* Cross-fade between booking steps */
-    .step-page {
-      transition: opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1), transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .step-hidden {
-      opacity: 0;
-      transform: translateY(6px) scale(0.99);
-      pointer-events: none;
-      position: absolute;
-      inset: 0;
-    }
-    .step-active {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      position: relative;
-    }
+    /* Fade-in for the booking step being shown (hidden steps use the `hidden` attribute,
+       so they take up no space at all, which avoids iOS Safari sizing the card around them) */
+    .step-enter { animation: stepIn 0.28s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes stepIn { from { opacity: 0; transform: translateY(6px) scale(0.99); } }
 
     .pill-track { touch-action: none; }
     [hidden] { display: none !important; }
 
     /* Make the native date picker icon visible on the dark background */
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
-    input[type="date"] { color-scheme: dark; }
+    input[type="date"] { color-scheme: dark; min-width: 0; }
+    /* iOS Safari gives date inputs a built-in minimum width and centred text; make them behave like the other fields */
+    @supports (-webkit-touch-callout: none) {
+      input[type="date"] { -webkit-appearance: none; appearance: none; display: block; min-height: 2.9rem; }
+      input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+    }
 
     @media (prefers-reduced-motion: reduce) {
       .blob, .wave { animation: none !important; }
-      .step-page, #sliderThumb { transition: none !important; }
+      .step-enter { animation: none !important; }
+      #sliderThumb, #hThumb { transition: none !important; }
     }
   </style>
 </head>
@@ -205,17 +199,26 @@
             </nav>
           </div>
 
+          <!-- Phones: horizontal instrument picker (the vertical slider is used from 640px up) -->
+          <div class="sm:hidden mb-4">
+            <span id="hRailLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Instrument focus</span>
+            <div id="hRail" role="radiogroup" aria-labelledby="hRailLabel" class="relative grid grid-cols-4 p-1 rounded-full bg-white/[0.04] border border-white/10 select-none">
+              <div id="hThumb" aria-hidden="true" class="absolute top-1 bottom-1 left-0 rounded-full bg-gradient-to-r from-red-500 to-amber-500 shadow-[0_2px_12px_rgba(239,68,68,0.4)] transition-transform duration-200 ease-out"></div>
+              <!-- Buttons are rendered from the `instruments` array -->
+            </div>
+          </div>
+
           <!-- Pages -->
           <div class="relative min-h-[250px] flex flex-col justify-center">
 
             <!-- PAGE 1: Format -->
-            <div id="page1" class="step-page step-active space-y-3">
+            <div id="page1" class="step-page space-y-3">
               <p class="text-xs text-stone-300 font-medium">Choose session format:</p>
               <div id="formatButtonsContainer" class="space-y-3"></div>
             </div>
 
             <!-- PAGE 2: Duration -->
-            <div id="page2" class="step-page step-hidden space-y-3" inert>
+            <div id="page2" class="step-page space-y-3" hidden>
               <div class="flex items-center justify-between">
                 <span class="text-xs text-stone-300 font-medium" id="page2FormatTitle">Select session length:</span>
                 <button type="button" data-go="1" class="text-[11px] text-red-400 hover:underline">← Format</button>
@@ -224,7 +227,7 @@
             </div>
 
             <!-- PAGE 3: Date & contact -->
-            <form id="page3" class="step-page step-hidden space-y-3" inert novalidate>
+            <form id="page3" class="step-page space-y-3" hidden novalidate>
               <div class="flex items-center justify-between">
                 <span id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug min-w-0">—</span>
                 <button type="button" data-go="2" class="shrink-0 ml-2 text-[11px] text-red-400 hover:underline">← Change</button>
@@ -288,7 +291,7 @@
             </form>
 
             <!-- PAGE 4: Success -->
-            <div id="page4" class="step-page step-hidden space-y-3.5" inert>
+            <div id="page4" class="step-page space-y-3.5" hidden>
               <div class="flex items-center justify-between">
                 <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold">✓ Request ready</span>
                 <button type="button" id="bookAnotherBtn" class="text-[11px] text-red-300 underline">Book another</button>
@@ -297,23 +300,23 @@
               <dl class="grid grid-cols-2 gap-2 text-xs">
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
                   <dt class="text-[9px] text-stone-400">Format</dt>
-                  <dd id="outFormat" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                  <dd id="outFormat" class="font-bold text-[#FDFBF7] break-words">-</dd>
                 </div>
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
                   <dt class="text-[9px] text-stone-400">Length &amp; rate</dt>
-                  <dd id="outRate" class="font-bold text-red-300 truncate">-</dd>
+                  <dd id="outRate" class="font-bold text-red-300 break-words">-</dd>
                 </div>
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
                   <dt class="text-[9px] text-stone-400">Instrument focus</dt>
-                  <dd id="outFocus" class="font-bold text-amber-200 truncate">-</dd>
+                  <dd id="outFocus" class="font-bold text-amber-200 break-words">-</dd>
                 </div>
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
                   <dt class="text-[9px] text-stone-400">Date &amp; time</dt>
-                  <dd id="outDate" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                  <dd id="outDate" class="font-bold text-[#FDFBF7] break-words">-</dd>
                 </div>
                 <div class="col-span-2 p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
                   <dt class="text-[9px] text-stone-400">Contact</dt>
-                  <dd id="outContact" class="font-bold text-[#FDFBF7] truncate">-</dd>
+                  <dd id="outContact" class="font-bold text-[#FDFBF7] break-words">-</dd>
                 </div>
               </dl>
 
@@ -328,14 +331,14 @@
           </div>
 
           <!-- Instrument focus status -->
-          <div class="pt-3 mt-2 border-t border-red-500/15 flex items-center justify-between text-xs">
+          <div class="pt-3 mt-2 border-t border-red-500/15 hidden sm:flex items-center justify-between text-xs">
             <span class="text-stone-400">Instrument focus:</span>
             <span id="focusNameDisplay" class="font-bold text-red-300 tracking-wide">Snare</span>
           </div>
         </div>
 
         <!-- Vertical instrument pill slider -->
-        <div class="w-[68px] sm:w-[74px] flex flex-col items-center justify-between bg-white/[0.03] border border-white/10 rounded-full py-3 px-1.5 pill-track select-none">
+        <div class="w-[74px] hidden sm:flex flex-col items-center justify-between bg-white/[0.03] border border-white/10 rounded-full py-3 px-1.5 pill-track select-none">
           <button type="button" id="instUpBtn" class="w-7 h-6 rounded-full text-red-300 hover:text-white text-xs flex items-center justify-center transition" aria-label="Previous instrument">▲</button>
 
           <div
@@ -486,7 +489,7 @@
     const subtitles = {
       1: 'Step 1 of 3 • Format',
       2: 'Step 2 of 3 • Length',
-      3: 'Step 3 of 3 • Date & Contact',
+      3: 'Step 3 of 3 • Details',
       4: 'Almost done',
     };
 
@@ -504,9 +507,12 @@
       [1, 2, 3, 4].forEach((n) => {
         const p = $('page' + n);
         const active = n === page;
-        p.classList.toggle('step-active', active);
-        p.classList.toggle('step-hidden', !active);
-        p.inert = !active; // keep hidden steps out of the tab order / screen readers
+        p.hidden = !active; // hidden steps take no space and are skipped by keyboard and screen readers
+        if (active) {
+          p.classList.remove('step-enter');
+          void p.offsetWidth; // restart the fade-in
+          p.classList.add('step-enter');
+        }
       });
 
       document.querySelectorAll('[data-step-dot]').forEach((dot) => {
@@ -860,9 +866,33 @@
       });
     }
 
+    const hRail = $('hRail');
+    const hThumb = $('hThumb');
+    let hButtons = [];
+
+    function renderHorizontalPicker() {
+      hButtons = instruments.map((name, i) => {
+        const b = el('button', 'relative z-10 py-2 rounded-full text-[12px] font-semibold transition-colors', name);
+        b.type = 'button';
+        b.setAttribute('role', 'radio');
+        b.addEventListener('click', () => setInstrumentStop(i));
+        b.addEventListener('keydown', (e) => {
+          const map = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 };
+          if (e.key in map) { e.preventDefault(); setInstrumentStop(state.instIndex + map[e.key]); hButtons[state.instIndex].focus(); }
+        });
+        hRail.append(b);
+        return b;
+      });
+    }
+
     function positionThumb() {
       const stop = stopButtons[state.instIndex];
       if (stop) thumb.style.transform = `translateY(${stop.offsetTop}px)`;
+      const hb = hButtons[state.instIndex];
+      if (hb) {
+        hThumb.style.width = hb.offsetWidth + 'px';
+        hThumb.style.transform = `translateX(${hb.offsetLeft}px)`;
+      }
     }
 
     function setInstrumentStop(index) {
@@ -872,6 +902,12 @@
       positionThumb();
       $('thumbLabel').textContent = name;
       $('focusNameDisplay').textContent = name;
+      hButtons.forEach((b, j) => {
+        b.setAttribute('aria-checked', j === i);
+        b.tabIndex = j === i ? 0 : -1;
+        b.classList.toggle('text-white', j === i);
+        b.classList.toggle('text-stone-400', j !== i);
+      });
       rail.setAttribute('aria-valuenow', i);
       rail.setAttribute('aria-valuetext', name);
       $('instUpBtn').disabled = i === 0;
@@ -882,6 +918,7 @@
 
     function initSlider() {
       renderInstrumentStops();
+      renderHorizontalPicker();
       let dragging = false;
 
       const nearestStop = (clientY) => {
@@ -919,7 +956,9 @@
       $('instDownBtn').addEventListener('click', () => setInstrumentStop(state.instIndex + 1));
 
       // Keep the thumb aligned when the panel resizes (rotation, window resize, font load)
-      new ResizeObserver(positionThumb).observe(rail);
+      const ro = new ResizeObserver(positionThumb);
+      ro.observe(rail);
+      ro.observe(hRail);
       setInstrumentStop(0);
     }
 
