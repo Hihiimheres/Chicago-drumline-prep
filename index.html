@@ -115,6 +115,7 @@
         <li class="flex gap-3"><span aria-hidden="true">✅</span><span><strong class="font-semibold text-white">Cancel at least 24 hours before your lesson</strong> and you’ll get a full refund.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 20 miles. Travel fees are paid at the lesson.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
       </ul>
@@ -312,7 +313,8 @@
                     <input type="text" id="clientZip" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="ZIP" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
                   </div>
                 </div>
-                <p class="text-[10px] text-stone-400">Where the in-person lesson will be, so I can plan travel.</p>
+                <p class="text-[10px] text-stone-400">I travel up to 20 driving miles. Free within 10 miles, then $1 per mile.</p>
+                <div id="travelInfo" role="status" aria-live="polite" class="text-[11px] rounded-xl px-3 py-2 border border-white/10 bg-white/[0.03] text-stone-300" hidden></div>
               </fieldset>
 
               <div id="payChoice" role="group" aria-labelledby="payLabel">
@@ -450,6 +452,20 @@
     const WEEKEND_TIMES = ['Any', 'Morning', 'Afternoon', 'Evening'];
     const WEEKDAY_TIMES = ['After 5 PM'];
     const STORAGE_KEY = 'bd-contact';
+
+    /* ---------------- Travel (in-person lessons) ----------------
+       Distance is measured from the centre of ZIP 60636 (not a street address).
+       Driving miles come from free OpenStreetMap services; if they can't be reached,
+       a straight-line estimate from the student's ZIP code is used instead. */
+    const TRAVEL = {
+      origin: [41.776, -87.6674],   // centre of ZIP 60636
+      freeMiles: 10,                // no fee up to here
+      perMile: 1,                   // $ per mile after freeMiles
+      maxMiles: 20,                 // farthest I travel
+      roadFactor: 1.25,             // straight-line -> rough driving estimate
+    };
+    // ZIP code centres within ~45 miles (US Census ZCTA data via the "zipcodes" package)
+    const ZIPS = {"46301":[41.693,-86.978],"46302":[41.354,-87.13],"46303":[41.371,-87.476],"46304":[41.614,-87.047],"46307":[41.424,-87.356],"46308":[41.417,-87.365],"46311":[41.492,-87.511],"46312":[41.635,-87.463],"46319":[41.533,-87.423],"46320":[41.61,-87.508],"46321":[41.554,-87.501],"46322":[41.55,-87.457],"46323":[41.588,-87.453],"46324":[41.584,-87.503],"46325":[41.462,-87.373],"46327":[41.633,-87.511],"46341":[41.316,-87.209],"46342":[41.526,-87.252],"46355":[41.359,-87.271],"46356":[41.285,-87.419],"46360":[41.698,-86.87],"46361":[41.703,-86.915],"46368":[41.567,-87.176],"46373":[41.45,-87.476],"46375":[41.492,-87.46],"46376":[41.19,-87.478],"46377":[41.192,-87.34],"46379":[41.167,-87.433],"46383":[41.455,-87.066],"46384":[41.49,-87.076],"46385":[41.471,-87.078],"46391":[41.536,-86.901],"46393":[41.512,-87.179],"46394":[41.679,-87.501],"46401":[41.591,-87.32],"46402":[41.6,-87.338],"46403":[41.604,-87.259],"46404":[41.59,-87.373],"46405":[41.569,-87.262],"46406":[41.588,-87.406],"46407":[41.58,-87.335],"46408":[41.542,-87.359],"46409":[41.541,-87.327],"46410":[41.496,-87.351],"46411":[41.462,-87.373],"60004":[42.112,-87.979],"60005":[42.064,-87.986],"60006":[42.088,-87.981],"60007":[42.008,-87.993],"60008":[42.073,-88.019],"60009":[42.004,-87.97],"60010":[42.161,-88.138],"60011":[42.323,-87.61],"60013":[42.22,-88.243],"60015":[42.17,-87.859],"60016":[42.047,-87.886],"60017":[42.029,-87.894],"60018":[42.016,-87.869],"60019":[42.024,-87.907],"60021":[42.194,-88.221],"60022":[42.133,-87.761],"60025":[42.076,-87.822],"60026":[42.07,-87.788],"60029":[42.058,-87.792],"60030":[42.352,-88.055],"60031":[42.367,-87.945],"60035":[42.179,-87.806],"60037":[42.21,-87.806],"60038":[42.098,-88.014],"60040":[42.203,-87.814],"60042":[42.274,-88.193],"60043":[42.088,-87.716],"60044":[42.282,-87.856],"60045":[42.237,-87.848],"60047":[42.217,-88.077],"60048":[42.281,-87.95],"60049":[42.17,-87.99],"60053":[42.043,-87.79],"60055":[42.098,-88.014],"60056":[42.062,-87.938],"60060":[42.264,-88.005],"60061":[42.229,-87.972],"60062":[42.125,-87.847],"60064":[42.325,-87.856],"60065":[42.127,-87.829],"60067":[42.114,-88.043],"60068":[42.012,-87.842],"60069":[42.198,-87.926],"60070":[42.106,-87.939],"60074":[42.146,-88.023],"60076":[42.036,-87.733],"60077":[42.035,-87.754],"60078":[42.11,-88.034],"60079":[42.364,-87.845],"60082":[42.116,-87.812],"60084":[42.264,-88.133],"60085":[42.354,-87.865],"60087":[42.399,-87.855],"60088":[42.303,-87.864],"60089":[42.16,-87.964],"60090":[42.134,-87.934],"60091":[42.077,-87.725],"60092":[42.28,-87.95],"60093":[42.105,-87.754],"60094":[42.11,-88.034],"60095":[42.11,-88.034],"60101":[41.934,-88.005],"60102":[42.164,-88.306],"60103":[41.979,-88.206],"60104":[41.883,-87.879],"60105":[41.955,-87.94],"60106":[41.95,-87.945],"60107":[42.023,-88.169],"60108":[41.948,-88.078],"60110":[42.123,-88.261],"60116":[41.913,-88.135],"60117":[41.84,-88.089],"60118":[42.096,-88.29],"60119":[41.882,-88.461],"60120":[42.038,-88.261],"60121":[42.037,-88.281],"60122":[42.067,-88.305],"60123":[42.038,-88.319],"60124":[42.029,-88.375],"60125":[41.91,-88.12],"60126":[41.893,-87.941],"60128":[41.84,-88.089],"60130":[41.874,-87.811],"60131":[41.934,-87.873],"60132":[41.84,-88.089],"60133":[41.999,-88.145],"60134":[41.886,-88.311],"60136":[42.098,-88.369],"60137":[41.866,-88.065],"60138":[41.877,-88.067],"60139":[41.92,-88.079],"60141":[41.862,-87.835],"60143":[41.972,-88.02],"60144":[41.835,-88.522],"60147":[41.937,-88.42],"60148":[41.872,-88.016],"60153":[41.879,-87.843],"60154":[41.852,-87.885],"60155":[41.858,-87.856],"60156":[42.182,-88.33],"60157":[41.981,-88.051],"60159":[42.033,-88.083],"60160":[41.9,-87.858],"60161":[41.901,-87.857],"60162":[41.873,-87.902],"60163":[41.889,-87.909],"60164":[41.921,-87.892],"60165":[41.903,-87.881],"60168":[42.033,-88.083],"60169":[42.049,-88.106],"60170":[42.02,-88.43],"60171":[41.928,-87.839],"60172":[41.98,-88.086],"60173":[42.058,-88.048],"60174":[41.919,-88.307],"60175":[41.948,-88.392],"60176":[41.956,-87.869],"60177":[41.997,-88.299],"60179":[42.079,-88.224],"60181":[41.88,-87.978],"60183":[41.937,-88.42],"60184":[41.953,-88.254],"60185":[41.889,-88.202],"60186":[41.885,-88.204],"60187":[41.872,-88.112],"60188":[41.918,-88.137],"60189":[41.84,-88.089],"60190":[41.874,-88.152],"60191":[41.96,-87.981],"60192":[42.043,-88.08],"60193":[42.014,-88.094],"60194":[42.029,-88.117],"60195":[42.076,-88.109],"60196":[42.056,-88.073],"60197":[41.913,-88.135],"60199":[41.84,-88.089],"60201":[42.055,-87.694],"60202":[42.03,-87.686],"60203":[42.048,-87.718],"60204":[42.041,-87.69],"60208":[42.059,-87.684],"60209":[42.05,-87.679],"60290":[41.85,-87.65],"60301":[41.889,-87.799],"60302":[41.892,-87.79],"60303":[41.885,-87.784],"60304":[41.873,-87.788],"60305":[41.895,-87.816],"60399":[41.955,-87.938],"60401":[41.344,-87.612],"60402":[41.835,-87.791],"60403":[41.555,-88.099],"60404":[41.508,-88.217],"60406":[41.658,-87.68],"60409":[41.615,-87.548],"60410":[41.435,-88.214],"60411":[41.509,-87.59],"60412":[41.506,-87.636],"60415":[41.702,-87.777],"60417":[41.439,-87.603],"60418":[41.645,-87.742],"60419":[41.626,-87.598],"60421":[41.426,-88.086],"60422":[41.541,-87.684],"60423":[41.509,-87.825],"60425":[41.547,-87.613],"60426":[41.61,-87.653],"60428":[41.6,-87.691],"60429":[41.574,-87.685],"60430":[41.556,-87.662],"60431":[41.471,-87.939],"60432":[41.538,-88.057],"60433":[41.512,-88.057],"60434":[41.525,-88.084],"60435":[41.545,-88.13],"60436":[41.488,-88.157],"60438":[41.566,-87.545],"60439":[41.707,-87.976],"60440":[41.698,-88.087],"60441":[41.593,-88.051],"60442":[41.429,-87.977],"60443":[41.51,-87.741],"60445":[41.635,-87.736],"60446":[41.64,-88.07],"60447":[41.462,-88.279],"60448":[41.534,-87.891],"60449":[41.419,-87.775],"60451":[41.507,-87.963],"60452":[41.608,-87.754],"60453":[41.714,-87.752],"60454":[41.812,-87.687],"60455":[41.743,-87.807],"60456":[41.731,-87.731],"60457":[41.726,-87.829],"60458":[41.745,-87.835],"60459":[41.745,-87.77],"60461":[41.513,-87.674],"60462":[41.619,-87.842],"60463":[41.662,-87.793],"60464":[41.662,-87.852],"60465":[41.7,-87.826],"60466":[41.479,-87.683],"60467":[41.602,-87.89],"60468":[41.336,-87.79],"60469":[41.628,-87.687],"60471":[41.482,-87.724],"60472":[41.642,-87.709],"60473":[41.598,-87.594],"60475":[41.469,-87.639],"60476":[41.573,-87.608],"60477":[41.583,-87.805],"60478":[41.564,-87.725],"60480":[41.736,-87.879],"60481":[41.308,-88.147],"60482":[41.69,-87.786],"60484":[41.442,-87.71],"60487":[41.564,-87.834],"60490":[41.679,-88.14],"60491":[41.603,-87.96],"60499":[41.812,-87.687],"60501":[41.78,-87.824],"60502":[41.785,-88.262],"60503":[41.72,-88.255],"60504":[41.752,-88.245],"60505":[41.758,-88.297],"60506":[41.766,-88.345],"60507":[41.761,-88.32],"60510":[41.848,-88.31],"60511":[41.759,-88.538],"60512":[41.702,-88.44],"60513":[41.822,-87.849],"60514":[41.797,-87.957],"60515":[41.803,-88.014],"60516":[41.76,-88.016],"60517":[41.752,-88.049],"60519":[41.778,-88.243],"60521":[41.8,-87.929],"60522":[41.84,-88.089],"60523":[41.837,-87.964],"60525":[41.784,-87.869],"60526":[41.832,-87.874],"60527":[41.745,-87.933],"60532":[41.786,-88.088],"60534":[41.813,-87.824],"60538":[41.718,-88.332],"60539":[41.824,-88.332],"60540":[41.766,-88.141],"60542":[41.809,-88.327],"60543":[41.685,-88.345],"60544":[41.601,-88.199],"60546":[41.838,-87.821],"60554":[41.774,-88.44],"60555":[41.828,-88.192],"60558":[41.805,-87.9],"60559":[41.773,-87.976],"60560":[41.639,-88.444],"60561":[41.743,-87.981],"60563":[41.789,-88.169],"60564":[41.704,-88.195],"60565":[41.733,-88.128],"60566":[41.84,-88.089],"60567":[41.786,-88.147],"60568":[41.761,-88.32],"60569":[41.812,-88.217],"60570":[41.84,-87.9],"60572":[41.761,-88.32],"60585":[41.656,-88.22],"60586":[41.564,-88.218],"60597":[41.76,-88.22],"60598":[41.84,-88.089],"60599":[41.84,-88.089],"60601":[41.886,-87.618],"60602":[41.883,-87.632],"60603":[41.88,-87.629],"60604":[41.879,-87.633],"60605":[41.871,-87.628],"60606":[41.887,-87.639],"60607":[41.872,-87.658],"60608":[41.852,-87.669],"60609":[41.81,-87.653],"60610":[41.903,-87.634],"60611":[41.897,-87.622],"60612":[41.88,-87.687],"60613":[41.954,-87.657],"60614":[41.923,-87.648],"60615":[41.802,-87.601],"60616":[41.843,-87.631],"60617":[41.726,-87.556],"60618":[41.946,-87.704],"60619":[41.746,-87.605],"60620":[41.741,-87.654],"60621":[41.775,-87.642],"60622":[41.902,-87.678],"60623":[41.849,-87.716],"60624":[41.88,-87.722],"60625":[41.97,-87.704],"60626":[42.01,-87.669],"60628":[41.693,-87.624],"60629":[41.778,-87.707],"60630":[41.97,-87.76],"60631":[41.995,-87.808],"60632":[41.809,-87.705],"60633":[41.664,-87.561],"60634":[41.946,-87.806],"60636":[41.776,-87.667],"60637":[41.781,-87.605],"60638":[41.781,-87.77],"60639":[41.92,-87.754],"60640":[41.972,-87.662],"60641":[41.945,-87.747],"60642":[41.901,-87.653],"60643":[41.7,-87.663],"60644":[41.883,-87.758],"60645":[42.009,-87.695],"60646":[41.993,-87.76],"60647":[41.921,-87.704],"60649":[41.762,-87.57],"60651":[41.903,-87.739],"60652":[41.745,-87.713],"60653":[41.82,-87.613],"60654":[41.892,-87.637],"60655":[41.695,-87.704],"60656":[41.974,-87.866],"60657":[41.94,-87.653],"60659":[41.997,-87.717],"60660":[41.991,-87.663],"60661":[41.881,-87.643],"60663":[41.87,-87.63],"60664":[41.812,-87.687],"60666":[41.85,-87.65],"60668":[41.812,-87.687],"60669":[41.812,-87.687],"60670":[41.812,-87.687],"60673":[41.812,-87.687],"60674":[41.812,-87.687],"60675":[41.812,-87.687],"60677":[41.812,-87.687],"60678":[41.812,-87.687],"60679":[41.87,-87.63],"60680":[41.812,-87.687],"60681":[41.812,-87.687],"60682":[41.837,-87.685],"60684":[41.812,-87.687],"60685":[41.812,-87.687],"60686":[41.876,-87.638],"60687":[41.812,-87.687],"60688":[41.872,-87.669],"60689":[41.874,-87.635],"60690":[41.812,-87.687],"60691":[41.812,-87.687],"60693":[41.85,-87.65],"60694":[41.812,-87.687],"60695":[41.884,-87.632],"60696":[41.868,-87.665],"60697":[41.812,-87.687],"60699":[41.812,-87.687],"60701":[41.812,-87.687],"60706":[41.964,-87.816],"60707":[41.923,-87.819],"60712":[42.008,-87.736],"60714":[42.031,-87.811],"60803":[41.672,-87.736],"60804":[41.838,-87.76],"60805":[41.722,-87.702],"60827":[41.65,-87.63],"60914":[41.166,-87.879],"60915":[41.145,-87.86],"60940":[41.248,-87.648],"60950":[41.251,-87.847],"60954":[41.159,-87.657]};
 
     const formats = {
       digital: {
@@ -646,6 +662,7 @@
 
     /* ---------------- Step 2: length ---------------- */
     function chooseRate(rate, btn) {
+      setTimeout(() => { readContact(); scheduleTravelCheck(); }, 150);
       state.rate = rate;
       $('choiceSummary').textContent = `${formats[state.format].label} • ${rateLabel(rate)} • $${rate.price}`;
       document.querySelectorAll('.rate-btn').forEach((b) => {
@@ -791,6 +808,114 @@
     }
 
     const isValidZip = (v) => /^\d{5}(-\d{4})?$/.test(v);
+
+    // travel = { status: 'idle'|'checking'|'ok'|'far', miles, fee, method: 'driving'|'estimate' }
+    let travel = { status: 'idle' };
+    const travelCache = new Map();
+    let travelTimer = null, travelSeq = 0;
+
+    function straightMiles(a, b) {
+      const rad = (d) => (d * Math.PI) / 180;
+      const dLat = rad(b[0] - a[0]), dLon = rad(b[1] - a[1]);
+      const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(dLon / 2) ** 2;
+      return 2 * 3958.8 * Math.asin(Math.sqrt(h));
+    }
+
+    async function fetchJson(url, ms = 7000) {
+      const ctl = new AbortController();
+      const t = setTimeout(() => ctl.abort(), ms);
+      try {
+        const res = await fetch(url, { signal: ctl.signal, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        return await res.json();
+      } finally { clearTimeout(t); }
+    }
+
+    async function measureTravel({ street, city, zip }) {
+      const zip5 = zip.slice(0, 5);
+      const zipCentre = ZIPS[zip5];
+      // 1) find the address on the map
+      let point = null;
+      try {
+        const q = new URLSearchParams({ format: 'json', limit: '1', countrycodes: 'us', street, city, postalcode: zip5 });
+        const hits = await fetchJson('https://nominatim.openstreetmap.org/search?' + q);
+        if (hits[0]) point = [Number(hits[0].lat), Number(hits[0].lon)];
+      } catch (_) { /* fall back below */ }
+      if (!point && !zipCentre) return { far: true, miles: null, method: 'zip' }; // ZIP far outside the area
+      const target = point || zipCentre;
+      // 2) driving distance along roads
+      if (point) {
+        try {
+          const o = TRAVEL.origin;
+          const route = await fetchJson(`https://router.project-osrm.org/route/v1/driving/${o[1]},${o[0]};${point[1]},${point[0]}?overview=false`);
+          if (route.code === 'Ok' && route.routes && route.routes[0]) {
+            return { miles: route.routes[0].distance / 1609.344, method: 'driving' };
+          }
+        } catch (_) { /* fall back below */ }
+      }
+      // 3) estimate: straight line x road factor
+      return { miles: straightMiles(TRAVEL.origin, target) * TRAVEL.roadFactor, method: 'estimate' };
+    }
+
+    function travelFee(miles) {
+      return Math.max(0, Math.round(miles) - TRAVEL.freeMiles) * TRAVEL.perMile;
+    }
+
+    function renderTravel() {
+      const box = $('travelInfo');
+      box.hidden = travel.status === 'idle';
+      const tone = {
+        checking: 'border-white/10 bg-white/[0.03] text-stone-300',
+        ok: 'border-emerald-400/30 bg-emerald-500/10 text-emerald-100',
+        far: 'border-red-400/40 bg-red-500/10 text-red-200',
+      }[travel.status] || '';
+      box.className = 'text-[11px] rounded-xl px-3 py-2 border ' + tone;
+      if (travel.status === 'checking') box.textContent = '📍 Checking distance…';
+      if (travel.status === 'ok') {
+        const about = travel.method === 'driving' ? '' : 'about ';
+        const what = travel.method === 'driving' ? 'driving miles' : 'miles (estimate)';
+        box.textContent = `📍 ${about}${travel.miles.toFixed(1)} ${what} · ` +
+          (travel.fee ? `Travel fee $${travel.fee}` : 'No travel fee');
+      }
+      if (travel.status === 'far') {
+        box.replaceChildren(
+          el('span', '', travel.miles
+            ? `🚫 That’s about ${Math.round(travel.miles)} miles away. I travel up to ${TRAVEL.maxMiles} miles. `
+            : `🚫 That ZIP code is outside my ${TRAVEL.maxMiles}-mile travel area. `),
+        );
+        const sw = el('button', 'underline font-semibold text-white', 'Book a digital lesson instead');
+        sw.type = 'button';
+        sw.addEventListener('click', () => chooseFormat('digital'));
+        box.append(sw);
+      }
+    }
+
+    function scheduleTravelCheck() {
+      if (state.format !== 'inperson') return;
+      const { street, city, zip } = state;
+      const ready = street.length >= 4 && city && isValidZip(zip);
+      const key = [street, city, zip.slice(0, 5)].join('|').toLowerCase();
+      if (!ready) { travel = { status: 'idle' }; renderTravel(); return; }
+      if (travel.key === key && travel.status !== 'idle') return;
+      clearTimeout(travelTimer);
+      if (travelCache.has(key)) { travel = travelCache.get(key); renderTravel(); updateSubmitState(); return; }
+      travel = { status: 'checking', key };
+      renderTravel();
+      updateSubmitState();
+      const seq = ++travelSeq;
+      // wait until typing pauses, so the map services get one request per address
+      travelTimer = setTimeout(async () => {
+        const res = await measureTravel({ street, city, zip });
+        if (seq !== travelSeq) return; // address changed meanwhile
+        const far = res.far || res.miles > TRAVEL.maxMiles;
+        travel = far
+          ? { status: 'far', key, miles: res.miles, method: res.method }
+          : { status: 'ok', key, miles: res.miles, method: res.method, fee: travelFee(res.miles) };
+        travelCache.set(key, travel);
+        renderTravel();
+        updateSubmitState();
+      }, 900);
+    }
     const needsAddress = () => state.format === 'inperson';
     const addressOk = () => !needsAddress() || (state.street.length >= 4 && state.city && isValidZip(state.zip));
     const lessonAddress = () => `${state.street}, ${state.city} ${state.zip}`;
@@ -808,12 +933,17 @@
       hint.classList.toggle('text-stone-400', !(touched && problem));
 
       const nameOk = state.first && state.last;
-      const ready = state.format && state.rate && dateOk && nameOk && !problem && addressOk();
+      const travelOk = !needsAddress() || travel.status === 'ok';
+      const ready = state.format && state.rate && dateOk && nameOk && !problem && addressOk() && travelOk;
       btn.disabled = !ready;
-      btn.textContent = ready ? `Request ${formatDate(state.date)} • $${state.rate.price}`
+      const fee = needsAddress() && travel.status === 'ok' ? travel.fee : 0;
+      btn.textContent = ready ? `Request ${formatDate(state.date)} • $${state.rate.price}${fee ? ` + $${fee} travel` : ''}`
         : !dateOk ? 'Pick a date to continue'
         : !nameOk ? 'Add your first and last name'
         : problem ? 'Add email or phone to continue'
+        : !addressOk() ? 'Add the lesson address'
+        : travel.status === 'checking' ? 'Checking distance…'
+        : travel.status === 'far' ? 'Outside my travel area'
         : 'Add the lesson address';
     }
 
@@ -833,10 +963,18 @@
         name: state.name,
         address: needsAddress() ? lessonAddress() : '',
         directions: needsAddress() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lessonAddress())}` : '',
+        travel_miles: needsAddress() && travel.miles ? `${travel.miles.toFixed(1)} mi (${travel.method === 'driving' ? 'driving' : 'estimate'})` : '',
+        travel_fee: needsAddress() ? (travel.fee ? `$${travel.fee} (paid at the lesson)` : 'None') : '',
         email: state.email,
         phone: state.phone,
         notes: state.notes,
       };
+    }
+
+    // "$35" or "$39 ($35 lesson + $4 travel)" for pay-at-lesson messages
+    function feeTotal(data) {
+      const fee = needsAddress() && travel.fee ? travel.fee : 0;
+      return fee ? `$${state.rate.price + fee} ($${state.rate.price} lesson + $${fee} travel)` : data.price;
     }
 
     async function submitBooking(e) {
@@ -868,7 +1006,8 @@
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           message = state.pay === 'online'
             ? '🎉 Request sent! Complete your payment below to lock in your lesson.'
-            : `🎉 Request received! Bring ${data.price} to your lesson. I’ll reach out to confirm the details.`;
+            : `🎉 Request received! Bring ${feeTotal(data)} to your lesson. I’ll reach out to confirm the details.`;
+          if (state.pay === 'online' && travel.fee && needsAddress()) message += ` The $${travel.fee} travel fee is paid at the lesson.`;
         } catch (_) {
           err.textContent = 'Couldn’t send your request. Check your connection and try again.';
           err.classList.remove('hidden');
@@ -886,6 +1025,8 @@
           data.name  && `Name: ${data.name}`,
           data.address && `Lesson address: ${data.address}`,
           data.directions && `Directions: ${data.directions}`,
+          data.travel_miles && `Distance: ${data.travel_miles}`,
+          data.travel_fee && `Travel fee: ${data.travel_fee}`,
           data.email && `Email: ${data.email}`,
           data.phone && `Phone: ${data.phone}`,
           data.notes && `Note: ${data.notes}`,
@@ -897,12 +1038,12 @@
       }
 
       $('outFormat').textContent  = data.format;
-      $('outRate').textContent    = `${data.length} • ${data.price}`;
+      $('outRate').textContent    = `${data.length} • ${data.price}` + (needsAddress() && travel.fee ? ` + $${travel.fee} travel` : '');
       $('outFocus').textContent   = data.instrument;
       $('outDate').textContent    = `${formatDate(data.date)} • ${data.time}`;
       $('outContact').textContent = [data.name, data.email, data.phone].filter(Boolean).join(' • ');
       $('outAddressRow').hidden = !data.address;
-      $('outAddress').textContent = data.address;
+      $('outAddress').textContent = data.address + (data.travel_miles ? ` (${data.travel_miles})` : '');
       $('successMsg').textContent = message;
       $('bookingRef').textContent = `Booking #${data.booking_id}`;
 
@@ -929,6 +1070,8 @@
       syncPayChoice();
       $('payBlock').hidden = true;
       setNoteOpen(false);
+      travel = { status: 'idle' };
+      renderTravel();
       $('submitError').classList.add('hidden');
       $('rateButtonsContainer').replaceChildren();
       document.querySelectorAll('[data-format]').forEach((b) => {
@@ -1108,6 +1251,8 @@
     ['sessionDateInput', 'clientFirst', 'clientLast', 'clientEmail', 'clientPhone', 'clientNotes',
      'clientStreet', 'clientCity', 'clientZip'].forEach((id) =>
       $(id).addEventListener('input', updateSubmitState));
+    ['clientStreet', 'clientCity', 'clientZip'].forEach((id) =>
+      $(id).addEventListener('input', () => { readContact(); scheduleTravelCheck(); }));
     $('clientPhone').addEventListener('blur', (e) => { e.target.value = formatUSPhone(e.target.value); updateSubmitState(); });
 
     $('page3').addEventListener('submit', submitBooking);
