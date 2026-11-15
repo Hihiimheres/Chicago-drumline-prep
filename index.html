@@ -276,7 +276,7 @@
      *   visitor's mail app opens with the booking details pre-filled.
      * ------------------------------------------------------------------ */
     const CONFIG = {
-      formEndpoint: '',
+      formEndpoint: 'https://formspree.io/f/xnpdpvan',
       contactEmail: 'Boston.drumming@icloud.com',
     };
 
@@ -542,7 +542,11 @@
           const res = await fetch(CONFIG.formEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-            body: JSON.stringify(data),
+            // Drop empty fields (Formspree rejects an empty `email`) and add a readable subject line
+            body: JSON.stringify({
+              ...Object.fromEntries(Object.entries(data).filter(([, v]) => v)),
+              _subject: `Lesson request: ${data.instrument}, ${formatDate(data.date)}`,
+            }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           message = '🎉 Request received! Boston Drumming will reach out to you shortly.';
