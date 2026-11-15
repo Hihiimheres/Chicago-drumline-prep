@@ -93,6 +93,7 @@
     }
 
     .pill-track { touch-action: none; }
+    [hidden] { display: none !important; }
 
     /* Make the native date picker icon visible on the dark background */
     input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85); cursor: pointer; }
@@ -107,6 +108,13 @@
 <body class="min-h-screen md:h-screen w-full text-[#F5EFE6] font-sans-custom antialiased md:overflow-hidden p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
   <!-- MAIN EDITORIAL CARD FRAME -->
+  <!-- Shown when Stripe sends the student back with ?paid=1 -->
+  <div id="paidBanner" role="status" hidden class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-4 py-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 backdrop-blur-xl text-emerald-100 text-xs font-medium shadow-2xl flex items-center gap-3">
+    <span class="text-lg" aria-hidden="true">✅</span>
+    <span class="flex-1">Payment received. Thank you! Stripe has emailed your receipt, and I’ll be in touch to confirm your lesson.</span>
+    <button type="button" id="paidBannerClose" class="text-emerald-200 hover:text-white text-base leading-none" aria-label="Dismiss">×</button>
+  </div>
+
   <main data-theme="ember" class="relative w-full md:h-full max-w-[1300px] md:max-h-[820px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col md:flex-row bg-[#100B0B]">
 
     <!-- Animated gradient-wave background -->
@@ -255,6 +263,15 @@
                 </label>
               </div>
 
+              <div id="payChoice" role="group" aria-labelledby="payLabel">
+                <span id="payLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Payment</span>
+                <div class="grid grid-cols-2 gap-1.5">
+                  <button type="button" data-pay="online">💳 Pay online now</button>
+                  <button type="button" data-pay="lesson">💵 Pay at the lesson</button>
+                </div>
+              </div>
+              <p id="payNotice" class="text-[10px] text-amber-200/90" hidden>💳 Digital lessons are paid online. You’ll go to secure checkout right after you submit.</p>
+
               <div>
                 <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-[11px] text-red-300 hover:underline">+ Add a note (experience, goals, audition date)</button>
                 <label for="clientNotes" class="sr-only">Note for your coach</label>
@@ -301,6 +318,12 @@
               </dl>
 
               <p id="successMsg" class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-[11px] text-red-200 text-center font-medium"></p>
+
+              <div id="payBlock" class="space-y-1.5" hidden>
+                <a id="payBtn" href="#" class="block w-full text-center py-3 rounded-full bg-gradient-to-r from-red-500 to-amber-500 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_18px_rgba(239,68,68,0.35)] transition transform active:scale-[0.98]">Pay securely →</a>
+                <p class="text-[10px] text-stone-400 text-center">🔒 Secure checkout by Stripe · Card, Apple Pay, Google Pay</p>
+              </div>
+              <p id="bookingRef" class="text-[10px] text-stone-500 text-center"></p>
             </div>
           </div>
 
@@ -347,10 +370,21 @@
      *   API...) that accepts a JSON POST. When set, bookings are sent there.
      * contactEmail: used as a fallback when no endpoint is set — the
      *   visitor's mail app opens with the booking details pre-filled.
+     * paymentLinks: one Stripe Payment Link per lesson (https://buy.stripe.com/...).
+     *   Leave one empty and students are told you'll send a payment link instead.
+     *   In Stripe, set each link's "After payment" to redirect to:
+     *   https://hihiimheres.github.io/Chicago-drumline-prep/?paid=1
      * ------------------------------------------------------------------ */
     const CONFIG = {
       formEndpoint: 'https://formspree.io/f/xnpdpvan',
       contactEmail: 'Boston.drumming@icloud.com',
+      paymentLinks: {
+        'digital-30':  '',   // Digital 30 min  — $15
+        'digital-60':  '',   // Digital 60 min  — $25
+        'digital-90':  '',   // Digital 90 min  — $35
+        'inperson-60': '',   // In-person 60 min — $35
+        'inperson-90': '',   // In-person 90 min — $50
+      },
     };
 
     /* ---------------- Data ---------------- */
@@ -369,9 +403,9 @@
         noteClass: 'text-red-300/80',
         page2Title: 'Digital length (online payment):',
         rates: [
-          { minutes: 30, price: 15 },
-          { minutes: 60, price: 25 },
-          { minutes: 90, price: 35 },
+          { id: 'digital-30', minutes: 30, price: 15 },
+          { id: 'digital-60', minutes: 60, price: 25 },
+          { id: 'digital-90', minutes: 90, price: 35 },
         ],
       },
       inperson: {
@@ -382,8 +416,8 @@
         noteClass: 'text-stone-400',
         page2Title: 'In-person length (Chicagoland area):',
         rates: [
-          { minutes: 60, price: 35 },
-          { minutes: 90, price: 50, tag: 'Audition Block' },
+          { id: 'inperson-60', minutes: 60, price: 35 },
+          { id: 'inperson-90', minutes: 90, price: 50, tag: 'Audition Block' },
         ],
       },
     };
@@ -405,6 +439,7 @@
       date: '',
       time: 'Any',
       notes: '',
+      pay: 'online',
       name: '',
       email: '',
       phone: '',
@@ -525,6 +560,7 @@
       });
 
       $('page2FormatTitle').textContent = f.page2Title;
+      syncPayChoice();
       const container = $('rateButtonsContainer');
       container.replaceChildren();
       f.rates.forEach((r) => {
@@ -602,6 +638,43 @@
       });
     }
 
+    /* ---------------- Payment ---------------- */
+    function syncPayChoice() {
+      const digital = state.format === 'digital';
+      if (digital) state.pay = 'online';
+      $('payChoice').hidden = digital;
+      $('payNotice').hidden = !digital;
+      document.querySelectorAll('[data-pay]').forEach((b) => {
+        const on = b.dataset.pay === state.pay;
+        b.className = 'py-1.5 rounded-lg border text-[11px] font-semibold transition ' +
+          (on ? 'border-red-400 bg-red-500/20 text-white' : 'border-white/10 bg-white/[0.03] text-stone-400 hover:text-stone-200');
+        b.setAttribute('aria-pressed', on);
+      });
+    }
+
+    function makeBookingId(iso) {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      let code = '';
+      for (let i = 0; i < 4; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      return `BD-${iso.slice(5, 7)}${iso.slice(8, 10)}-${code}`;
+    }
+
+    function paymentUrl(data) {
+      const base = CONFIG.paymentLinks[state.rate.id];
+      if (!base) return '';
+      const url = new URL(base);
+      if (data.email) url.searchParams.set('prefilled_email', data.email);
+      url.searchParams.set('client_reference_id', data.booking_id);
+      return url.toString();
+    }
+
+    function showPaidBannerIfReturning() {
+      const params = new URLSearchParams(location.search);
+      if (!params.has('paid')) return;
+      $('paidBanner').hidden = false;
+      history.replaceState(null, '', location.pathname); // tidy the address bar
+    }
+
     function setNoteOpen(open) {
       $('clientNotes').hidden = !open;
       $('noteToggle').setAttribute('aria-expanded', open);
@@ -661,7 +734,8 @@
       const f = formats[state.format];
       return {
         format: f.label,
-        payment: f.note,
+        booking_id: makeBookingId(state.date),
+        payment: state.pay === 'online' ? 'Online (Stripe)' : 'At the lesson',
         length: rateLabel(state.rate),
         price: `$${state.rate.price}`,
         instrument: instruments[state.instIndex],
@@ -697,11 +771,13 @@
             body: JSON.stringify({
               ...Object.fromEntries(Object.entries(data).filter(([, v]) => v)),
               ...($('hpField').value ? { _gotcha: $('hpField').value } : {}),
-              _subject: `Lesson request: ${data.instrument}, ${formatDate(data.date)}`,
+              _subject: `Lesson request ${data.booking_id}: ${data.instrument}, ${formatDate(data.date)} (${data.payment})`,
             }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          message = '🎉 Request received! Boston Drumming will reach out to you shortly.';
+          message = state.pay === 'online'
+            ? '🎉 Request sent! Complete your payment below to lock in your lesson.'
+            : `🎉 Request received! Bring ${data.price} to your lesson. I’ll reach out to confirm the details.`;
         } catch (_) {
           err.textContent = 'Couldn’t send your request. Check your connection and try again.';
           err.classList.remove('hidden');
@@ -710,7 +786,9 @@
         }
       } else {
         const details = [
-          `Format: ${data.format} (${data.payment})`,
+          `Booking: ${data.booking_id}`,
+          `Format: ${data.format}`,
+          `Payment: ${data.payment}`,
           `Length: ${data.length} — ${data.price}`,
           `Instrument focus: ${data.instrument}`,
           `Preferred date: ${formatDate(data.date)} (${data.date}), ${data.time}`,
@@ -731,6 +809,16 @@
       $('outDate').textContent    = `${formatDate(data.date)} • ${data.time}`;
       $('outContact').textContent = [data.name, data.email, data.phone].filter(Boolean).join(' • ');
       $('successMsg').textContent = message;
+      $('bookingRef').textContent = `Booking #${data.booking_id}`;
+
+      const payUrl = state.pay === 'online' ? paymentUrl(data) : '';
+      $('payBlock').hidden = !payUrl;
+      if (payUrl) {
+        $('payBtn').href = payUrl;
+        $('payBtn').textContent = `Pay ${data.price} securely →`;
+      } else if (state.pay === 'online' && CONFIG.formEndpoint) {
+        $('successMsg').textContent = '🎉 Request received! I’ll send you a secure payment link with your confirmation.';
+      }
       goToPage(4);
     }
 
@@ -743,6 +831,8 @@
       $('rememberMe').checked = true;
       loadSavedContact();
       renderTimeChips();
+      syncPayChoice();
+      $('payBlock').hidden = true;
       setNoteOpen(false);
       $('submitError').classList.add('hidden');
       $('rateButtonsContainer').replaceChildren();
@@ -871,6 +961,11 @@
     $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;
     $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
     $('sessionDateInput').addEventListener('input', renderTimeChips);
+    document.querySelectorAll('[data-pay]').forEach((b) =>
+      b.addEventListener('click', () => { state.pay = b.dataset.pay; syncPayChoice(); }));
+    $('paidBannerClose').addEventListener('click', () => { $('paidBanner').hidden = true; });
+    syncPayChoice();
+    showPaidBannerIfReturning();
 
     document.querySelectorAll('[data-go]').forEach((b) =>
       b.addEventListener('click', () => goToPage(Number(b.dataset.go))));
