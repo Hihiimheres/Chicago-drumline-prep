@@ -114,12 +114,47 @@
         <li class="flex gap-3"><span aria-hidden="true">✅</span><span><strong class="font-semibold text-white">Cancel at least 24 hours before your lesson</strong> and you’ll get a full refund.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
-        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 20 miles. Travel fees are paid at the lesson.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 20 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
       </ul>
       <button type="button" id="policyOk" class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider">Got it</button>
     </div>
+  </dialog>
+
+  <!-- Review form (footer link, or open the site with ?review to show it straight away) -->
+  <dialog id="reviewDialog" aria-labelledby="reviewTitle" class="w-[calc(100%-2rem)] max-w-md p-0 rounded-3xl bg-[#140D0D] text-[#F5EFE6] border border-red-500/30 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
+    <form id="reviewForm" class="p-6 sm:p-7 space-y-4" novalidate>
+      <div class="flex items-start justify-between gap-4">
+        <h2 id="reviewTitle" class="font-serif-custom text-3xl leading-none">Leave a review</h2>
+        <button type="button" data-close-dialog class="text-stone-400 hover:text-white text-2xl leading-none -mt-1" aria-label="Close">×</button>
+      </div>
+      <div id="reviewFields" class="space-y-3">
+        <fieldset>
+          <legend class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Your rating</legend>
+          <div id="reviewStars" class="flex gap-1" role="radiogroup" aria-label="Rating out of 5"></div>
+        </fieldset>
+        <div>
+          <label for="reviewName" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Your name</label>
+          <input type="text" id="reviewName" autocomplete="name" maxlength="60" placeholder="e.g. Jordan T." class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+        </div>
+        <div>
+          <label for="reviewText" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Your review</label>
+          <textarea id="reviewText" rows="4" maxlength="800" placeholder="How did your lessons go?" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none resize-none"></textarea>
+        </div>
+        <label class="flex items-start gap-2 text-[11px] text-stone-300 cursor-pointer">
+          <input type="checkbox" id="reviewConsent" checked class="accent-red-500 w-3.5 h-3.5 mt-0.5"> It’s OK to show my review and first name on the website
+        </label>
+        <input type="text" id="reviewHp" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
+        <button type="submit" id="reviewSubmit" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider disabled:opacity-35 disabled:cursor-not-allowed">Pick a rating</button>
+        <p id="reviewError" class="hidden text-[11px] text-red-300 text-center" role="alert"></p>
+      </div>
+      <div id="reviewThanks" class="space-y-3 text-center" hidden>
+        <p class="text-4xl" aria-hidden="true">🥁</p>
+        <p class="text-sm text-stone-200">Thank you! Your review was sent.</p>
+        <button type="button" data-close-dialog class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider">Close</button>
+      </div>
+    </form>
   </dialog>
 
   <!-- Shown when Stripe sends the student back with ?paid=1 -->
@@ -190,6 +225,11 @@
           </ul>
         </div>
 
+        <div id="reviewsSection" class="max-w-md mb-5 space-y-2" hidden>
+          <h2 class="text-[10px] uppercase tracking-[0.2em] text-red-400 font-semibold">What students say</h2>
+          <div id="reviewsList" class="space-y-2"></div>
+        </div>
+
         <button type="button" id="exploreBtn" class="px-7 py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs tracking-wide shadow-xl transition transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">
           Explore my services
         </button>
@@ -198,6 +238,7 @@
       <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
         <span>✦ Snare / Tenors / Bass / Cymbals</span>
         <span class="flex items-center gap-3">
+          <button type="button" data-open-review class="text-stone-300 hover:text-white hover:underline">Leave a review</button>
           <button type="button" data-open-policy class="text-stone-300 hover:text-white hover:underline">Cancellation &amp; refunds</button>
           <a id="questionsLink" href="mailto:Boston.drumming@icloud.com" class="text-red-400/90 font-medium hover:text-red-300 hover:underline">Questions? Email me →</a>
         </span>
@@ -433,6 +474,7 @@
      *   Leave one empty and students are told you'll send a payment link instead.
      *   In Stripe, set each link's "After payment" to redirect to:
      *   https://hihiimheres.github.io/Chicago-drumline-prep/?paid=1
+     * travelFeeLinks: Stripe links for an in-person lesson plus a $1–$10 travel fee.
      * ------------------------------------------------------------------ */
     const CONFIG = {
       formEndpoint: 'https://formspree.io/f/xnpdpvan',
@@ -444,7 +486,39 @@
         'inperson-60': 'https://buy.stripe.com/00w14na1a2Xj92U8ASasg05',   // In-person 60 min — $35
         'inperson-90': 'https://buy.stripe.com/cNi28r6OY69v2Ew6sKasg01',   // In-person 90 min — $50
       },
+      // In-person lesson + travel fee in one checkout: travelFeeLinks[lesson][fee in $]
+      travelFeeLinks: {
+        'inperson-60': {
+           1: 'https://buy.stripe.com/dRm3cvddm7dzfridVcasg06',   // $36
+           2: 'https://buy.stripe.com/28E5kDgpy1Tf0wo04masg07',   // $37
+           3: 'https://buy.stripe.com/5kQ28r6OY7dz92UbN4asg08',   // $38
+           4: 'https://buy.stripe.com/aFa4gz8X655rene3gyasg09',   // $39
+           5: 'https://buy.stripe.com/fZu28r1uEdBXbb26sKasg0a',   // $40
+           6: 'https://buy.stripe.com/6oU6oHddmbtP7YQcR8asg0b',   // $41
+           7: 'https://buy.stripe.com/28E3cvc9iapL6UMeZgasg0c',   // $42
+           8: 'https://buy.stripe.com/aFa6oHa1a0Pbbb27wOasg0d',   // $43
+           9: 'https://buy.stripe.com/eVqdR9b5eapLdjag3kasg0e',   // $44
+          10: 'https://buy.stripe.com/3cIbJ14GQapL92U8ASasg0f',   // $45
+        },
+        'inperson-90': {
+           1: 'https://buy.stripe.com/6oU4gzgpyapL3IAbN4asg0g',   // $51
+           2: 'https://buy.stripe.com/00w00jehqgO9a6Y7wOasg0h',   // $52
+           3: 'https://buy.stripe.com/6oUaEX7T27dz1AsbN4asg0i',   // $53
+           4: 'https://buy.stripe.com/bJe4gz0qA69v3IA9EWasg0j',   // $54
+           5: 'https://buy.stripe.com/00w5kDgpy8hDa6Y3gyasg0k',   // $55
+           6: 'https://buy.stripe.com/bJe14nb5e2Xjcf67wOasg0l',   // $56
+           7: 'https://buy.stripe.com/eVqfZh4GQcxTgvmdVcasg0m',   // $57
+           8: 'https://buy.stripe.com/dRm7sLgpy9lH2Ew18qasg0n',   // $58
+           9: 'https://buy.stripe.com/6oU00j8X69lHcf65oGasg0o',   // $59
+          10: 'https://buy.stripe.com/28E00j1uE1Tf4ME4kCasg0p',   // $60
+        },
+      },
     };
+
+    /* ---------------- Reviews shown on the site ----------------
+       Reviews sent through the form arrive by email; add the ones you approve here, e.g.
+       { name: 'Jordan T.', stars: 5, text: 'Great lessons!' } */
+    const REVIEWS = [];
 
     /* ---------------- Data ---------------- */
     const instruments = ['Snare', 'Tenors', 'Bass', 'Cymbals'];
@@ -756,8 +830,16 @@
       return `BD-${iso.slice(5, 7)}${iso.slice(8, 10)}-${code}`;
     }
 
+    // Travel fee (whole dollars) that's being charged in this booking's online checkout, or 0
+    function onlineTravelFee() {
+      if (state.pay !== 'online' || !needsAddress() || !travel.fee) return 0;
+      const links = CONFIG.travelFeeLinks[state.rate.id];
+      return links && links[travel.fee] ? travel.fee : 0;
+    }
+
     function paymentUrl(data) {
-      const base = CONFIG.paymentLinks[state.rate.id];
+      const fee = onlineTravelFee();
+      const base = fee ? CONFIG.travelFeeLinks[state.rate.id][fee] : CONFIG.paymentLinks[state.rate.id];
       if (!base) return '';
       const url = new URL(base);
       if (data.email) url.searchParams.set('prefilled_email', data.email);
@@ -978,7 +1060,7 @@
         directions_apple_maps: needsAddress() ? `https://maps.apple.com/?daddr=${encodeURIComponent(lessonAddress())}&dirflg=d` : '',
         directions_google_maps: needsAddress() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(lessonAddress())}&travelmode=driving` : '',
         travel_miles: needsAddress() && travel.miles ? `${travel.miles.toFixed(1)} mi (${travel.method === 'driving' ? 'driving' : 'estimate'})` : '',
-        travel_fee: needsAddress() ? (travel.fee ? `$${travel.fee} (paid at the lesson)` : 'None') : '',
+        travel_fee: needsAddress() ? (travel.fee ? `$${travel.fee} (${onlineTravelFee() ? 'included in online payment' : 'paid at the lesson'})` : 'None') : '',
         email: state.email,
         phone: state.phone,
         notes: state.notes,
@@ -1021,7 +1103,7 @@
           message = state.pay === 'online'
             ? '🎉 Request sent! Complete your payment below to lock in your lesson.'
             : `🎉 Request received! Bring ${feeTotal(data)} to your lesson. I’ll reach out to confirm the details.`;
-          if (state.pay === 'online' && travel.fee && needsAddress()) message += ` The $${travel.fee} travel fee is paid at the lesson.`;
+          if (state.pay === 'online' && travel.fee && needsAddress() && !onlineTravelFee()) message += ` The $${travel.fee} travel fee is paid at the lesson.`;
         } catch (_) {
           err.textContent = 'Couldn’t send your request. Check your connection and try again.';
           err.classList.remove('hidden');
@@ -1066,7 +1148,8 @@
       $('payBlock').hidden = !payUrl;
       if (payUrl) {
         $('payBtn').href = payUrl;
-        $('payBtn').textContent = `Pay ${data.price} securely →`;
+        const fee = onlineTravelFee();
+        $('payBtn').textContent = `Pay $${state.rate.price + fee} securely →`;
       } else if (state.pay === 'online' && CONFIG.formEndpoint) {
         $('successMsg').textContent = '🎉 Request received! I’ll send you a secure payment link with your confirmation.';
       }
@@ -1227,6 +1310,94 @@
       if (saved > 0) applyTheme(saved);
     } catch (_) {}
 
+    /* ---------------- Reviews ---------------- */
+    let reviewStars = 0;
+
+    function renderReviews() {
+      const list = $('reviewsList');
+      list.replaceChildren(...REVIEWS.map((rv) => {
+        const card = el('figure', 'p-3 rounded-2xl bg-black/35 border border-white/10');
+        const stars = el('div', 'text-amber-300 text-xs', '★'.repeat(rv.stars) + '☆'.repeat(5 - rv.stars));
+        stars.setAttribute('aria-label', `${rv.stars} out of 5 stars`);
+        card.append(stars, el('blockquote', 'mt-1 text-[13px] text-stone-200 font-light leading-relaxed', `“${rv.text}”`),
+          el('figcaption', 'mt-1 text-[11px] text-stone-400', `— ${rv.name}`));
+        return card;
+      }));
+      $('reviewsSection').hidden = REVIEWS.length === 0;
+    }
+
+    function syncReviewForm() {
+      document.querySelectorAll('#reviewStars button').forEach((b, i) => {
+        b.className = 'text-3xl leading-none transition ' + (i < reviewStars ? 'text-amber-300' : 'text-stone-600 hover:text-stone-400');
+        b.setAttribute('aria-checked', i + 1 === reviewStars);
+      });
+      const ready = reviewStars > 0 && $('reviewName').value.trim() && $('reviewText').value.trim().length >= 3;
+      $('reviewSubmit').disabled = !ready;
+      $('reviewSubmit').textContent = !reviewStars ? 'Pick a rating' : ready ? 'Send review' : 'Add your name and review';
+    }
+
+    function openReview() {
+      $('reviewFields').hidden = false;
+      $('reviewThanks').hidden = true;
+      $('reviewError').classList.add('hidden');
+      if (!$('reviewName').value && state.first) $('reviewName').value = `${state.first} ${state.last.charAt(0)}${state.last ? '.' : ''}`.trim();
+      syncReviewForm();
+      openDialog($('reviewDialog'));
+    }
+
+    async function submitReview(e) {
+      e.preventDefault();
+      syncReviewForm();
+      if ($('reviewSubmit').disabled) return;
+      const name = $('reviewName').value.trim(), text = $('reviewText').value.trim();
+      const btn = $('reviewSubmit');
+      btn.disabled = true; btn.textContent = 'Sending…';
+      try {
+        const res = await fetch(CONFIG.formEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            form: 'review',
+            rating: `${reviewStars} / 5`,
+            name, review: text,
+            ok_to_publish: $('reviewConsent').checked ? 'Yes' : 'No',
+            ...($('reviewHp').value ? { _gotcha: $('reviewHp').value } : {}),
+            _subject: `New review: ${'★'.repeat(reviewStars)} from ${name}`,
+          }),
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        $('reviewForm').reset();
+        reviewStars = 0;
+        $('reviewFields').hidden = true;
+        $('reviewThanks').hidden = false;
+      } catch (_) {
+        $('reviewError').textContent = 'Couldn’t send your review. Check your connection and try again.';
+        $('reviewError').classList.remove('hidden');
+        syncReviewForm();
+      }
+    }
+
+    function initReviews() {
+      $('reviewStars').replaceChildren(...[1, 2, 3, 4, 5].map((n) => {
+        const b = el('button', '', '★');
+        b.type = 'button';
+        b.setAttribute('role', 'radio');
+        b.setAttribute('aria-label', `${n} star${n > 1 ? 's' : ''}`);
+        b.addEventListener('click', () => { reviewStars = n; syncReviewForm(); });
+        return b;
+      }));
+      ['reviewName', 'reviewText'].forEach((id) => $(id).addEventListener('input', syncReviewForm));
+      $('reviewForm').addEventListener('submit', submitReview);
+      document.querySelectorAll('[data-open-review]').forEach((b) => b.addEventListener('click', openReview));
+      renderReviews();
+      // A link like .../?review opens the form straight away (handy to text students after a lesson)
+      const params = new URLSearchParams(location.search);
+      if (params.has('review')) {
+        history.replaceState(null, '', location.pathname);
+        openReview();
+      }
+    }
+
     /* ---------------- Explore button ---------------- */
     function highlightServices() {
       goToPage(1);
@@ -1250,18 +1421,22 @@
     document.querySelectorAll('[data-pay]').forEach((b) =>
       b.addEventListener('click', () => { state.pay = b.dataset.pay; syncPayChoice(); }));
     $('paidBannerClose').addEventListener('click', () => { $('paidBanner').hidden = true; });
-    document.querySelectorAll('[data-open-policy]').forEach((b) =>
-      b.addEventListener('click', () => {
-        const d = $('policyDialog');
-        if (typeof d.showModal === 'function') { d.showModal(); return; }
-        // Older browsers: show it pinned on top of the page instead
-        Object.assign(d.style, { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: '100', margin: '0', maxHeight: '90vh', overflow: 'auto' });
-        d.setAttribute('open', '');
-      }));
-    const closePolicy = () => { const d = $('policyDialog'); if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); };
-    ['policyClose', 'policyOk'].forEach((id) => $(id).addEventListener('click', closePolicy));
-    // Close when tapping the dark area around the dialog
-    $('policyDialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) closePolicy(); });
+    function openDialog(d) {
+      if (typeof d.showModal === 'function') { d.showModal(); return; }
+      // Older browsers (iOS < 15.4): show it pinned on top of the page instead
+      Object.assign(d.style, { position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: '100', margin: '0', maxHeight: '90vh', overflow: 'auto' });
+      d.setAttribute('open', '');
+    }
+    function closeDialog(d) { if (typeof d.close === 'function') d.close(); else d.removeAttribute('open'); }
+
+    document.querySelectorAll('[data-open-policy]').forEach((b) => b.addEventListener('click', () => openDialog($('policyDialog'))));
+    ['policyClose', 'policyOk'].forEach((id) => $(id).addEventListener('click', () => closeDialog($('policyDialog'))));
+    document.querySelectorAll('dialog').forEach((d) => {
+      // Close when tapping the dark area around the dialog
+      d.addEventListener('click', (e) => { if (e.target === d) closeDialog(d); });
+      d.querySelectorAll('[data-close-dialog]').forEach((b) => b.addEventListener('click', () => closeDialog(d)));
+    });
+    initReviews();
     syncPayChoice();
     showPaidBannerIfReturning();
 
