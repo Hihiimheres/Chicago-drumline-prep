@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-15.3">
+  <meta name="site-version" content="2026-11-15.4">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" href="brand/logo-mark.png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
@@ -174,7 +174,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.3">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.4">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -360,19 +360,15 @@
 
             <!-- PAGE 2: Duration -->
             <div id="page2" class="step-page space-y-3" hidden>
-              <div class="flex items-center justify-between">
-                <span class="text-xs text-stone-300 font-medium" id="page2FormatTitle">Select session length:</span>
-                <button type="button" data-go="1" class="text-[11px] text-red-400 hover:underline">← Format</button>
-              </div>
+              <button type="button" data-go="1" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-[11px] font-semibold text-stone-200 transition" aria-label="Back to format">← Back</button>
+              <p class="text-xs text-stone-300 font-medium" id="page2FormatTitle">Select session length:</p>
               <div id="rateButtonsContainer" class="space-y-2.5"></div>
             </div>
 
             <!-- PAGE 3: Date & contact -->
             <form id="page3" class="step-page space-y-3" hidden novalidate>
-              <div class="flex items-center justify-between">
-                <span id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug min-w-0">—</span>
-                <button type="button" data-go="2" class="shrink-0 ml-2 text-[11px] text-red-400 hover:underline">← Change</button>
-              </div>
+              <button type="button" data-go="2" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-[11px] font-semibold text-stone-200 transition" aria-label="Back to lesson length">← Back</button>
+              <p id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug w-fit max-w-full">—</p>
 
               <div>
                 <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
@@ -480,10 +476,11 @@
 
             <!-- PAGE 4: Success -->
             <div id="page4" class="step-page space-y-3.5" hidden>
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] uppercase tracking-widest text-red-400 font-bold">✓ Request ready</span>
+              <div class="flex items-center justify-between gap-2">
+                <button type="button" id="editBookingBtn" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-[11px] font-semibold text-stone-200 transition">← Back to edit</button>
                 <button type="button" id="bookAnotherBtn" class="text-[11px] text-red-300 underline">Book another</button>
               </div>
+              <p class="text-[10px] uppercase tracking-widest text-red-400 font-bold">✓ Request ready</p>
 
               <dl class="grid grid-cols-2 gap-2 text-xs">
                 <div class="p-2.5 rounded-xl bg-black/40 border border-white/5 min-w-0">
@@ -691,6 +688,8 @@
       email: '',
       phone: '',
       minor: false,
+      lastBookingId: '',   // the booking shown on the confirmation step
+      correctionOf: '',    // set when "Back to edit" is used after sending
       guardianName: '',
       guardianPhone: '',
     });
@@ -1149,6 +1148,7 @@
       return {
         format: f.label,
         booking_id: makeBookingId(state.date),
+        replaces_booking: state.correctionOf ? `#${state.correctionOf}` : '',
         payment: state.pay === 'online' ? 'Online (Stripe)' : 'At the lesson',
         length: rateLabel(state.rate),
         price: `$${state.rate.price}`,
@@ -1202,7 +1202,7 @@
             body: JSON.stringify({
               ...Object.fromEntries(Object.entries(data).filter(([, v]) => v)),
               ...($('hpField').value ? { _gotcha: $('hpField').value } : {}),
-              _subject: `Lesson request ${data.booking_id}: ${data.instrument}, ${formatDate(data.date)} (${data.payment})`,
+              _subject: `${state.correctionOf ? `Correction to ${state.correctionOf} → ` : 'Lesson request '}${data.booking_id}: ${data.instrument}, ${formatDate(data.date)} (${data.payment})`,
             }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -1219,6 +1219,7 @@
       } else {
         const details = [
           `Booking: ${data.booking_id}`,
+          data.replaces_booking && `This replaces booking ${data.replaces_booking}`,
           `Format: ${data.format}`,
           `Payment: ${data.payment}`,
           `Length: ${data.length} — ${data.price}`,
@@ -1260,6 +1261,12 @@
       } else if (state.pay === 'online' && CONFIG.formEndpoint) {
         $('successMsg').textContent = '🎉 Request received! I’ll send you a secure payment link with your confirmation.';
       }
+      if (state.correctionOf) {
+        $('bookingRef').textContent = `Booking #${data.booking_id} (replaces #${state.correctionOf})`;
+        $('successMsg').textContent += ` This replaces booking #${state.correctionOf}. If you already paid for that one, you don’t need to pay again. I’ll sort it out.`;
+      }
+      state.lastBookingId = data.booking_id;
+      state.correctionOf = '';
       goToPage(4);
     }
 
@@ -1569,6 +1576,11 @@
 
     $('page3').addEventListener('submit', submitBooking);
     $('bookAnotherBtn').addEventListener('click', resetBooking);
+    $('editBookingBtn').addEventListener('click', () => {
+      state.correctionOf = state.lastBookingId;
+      updateSubmitState();
+      goToPage(3);
+    });
     $('bgSwitchBtn').addEventListener('click', cycleTheme);
     $('exploreBtn').addEventListener('click', highlightServices);
 
