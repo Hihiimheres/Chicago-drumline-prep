@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-15.5">
+  <meta name="site-version" content="2026-11-15.6">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" href="brand/logo-mark.png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
@@ -174,7 +174,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.5">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.6">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -350,7 +350,7 @@
           </div>
 
           <!-- Pages -->
-          <div class="relative min-h-[250px] flex flex-col justify-center">
+          <div class="relative sm:min-h-[250px] flex flex-col sm:justify-center">
 
             <!-- PAGE 1: Format -->
             <div id="page1" class="step-page space-y-3">
@@ -825,12 +825,12 @@
       const container = $('rateButtonsContainer');
       container.replaceChildren();
       f.rates.forEach((r) => {
-        const btn = el('button', 'rate-btn w-full px-4 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:border-red-400 transition flex items-center justify-between gap-3');
+        const btn = el('button', 'rate-btn w-full px-5 py-5 sm:py-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-red-400 transition flex items-center justify-between gap-3');
         btn.type = 'button';
         btn.setAttribute('aria-pressed', 'false');
         btn.append(
-          el('span', 'text-xs font-bold text-white text-left', rateLabel(r)),
-          el('span', 'shrink-0 text-sm font-extrabold text-red-300', `$${r.price} →`),
+          el('span', 'text-base sm:text-sm font-bold text-white text-left', rateLabel(r)),
+          el('span', 'shrink-0 text-xl sm:text-base font-extrabold text-red-300', `$${r.price} →`),
         );
         btn.addEventListener('click', () => chooseRate(r, btn));
         container.append(btn);
