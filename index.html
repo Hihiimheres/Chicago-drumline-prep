@@ -10,13 +10,14 @@
   <meta property="og:title" content="Boston Drumming — Learn, practice, play.">
   <meta property="og:description" content="Snare, tenor, bass and cymbal lessons in Boston and online. Book a session in under a minute.">
   <meta property="og:url" content="https://hihiimheres.github.io/Chicago-drumline-prep/">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=1200&h=630&q=80">
+  <meta property="og:image" content="https://hihiimheres.github.io/Chicago-drumline-prep/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <title>Boston Drumming</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://images.unsplash.com">
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Tailwind Play CDN is fine for prototyping; for production, compile Tailwind to a static CSS file. -->
@@ -31,12 +32,48 @@
       background-size: 24px 24px;
     }
 
-    @keyframes slowPan {
-      0%   { transform: scale(1.03) translate(0, 0); }
-      50%  { transform: scale(1.08) translate(-1%, -1%); }
-      100% { transform: scale(1.03) translate(0, 0); }
+    /* ---- Animated gradient-wave background ----
+       Colours come from --c1/--c2/--c3, set per theme on <main data-theme="..."> */
+    main[data-theme="ember"]    { --c1: #dc2626; --c2: #f59e0b; --c3: #7f1d1d; }
+    main[data-theme="sunset"]   { --c1: #e11d48; --c2: #fb923c; --c3: #7c3aed; }
+    main[data-theme="midnight"] { --c1: #4f46e5; --c2: #c026d3; --c3: #0e7490; }
+
+    .bg-waves { background: radial-gradient(120% 90% at 80% 100%, color-mix(in srgb, var(--c3) 35%, #0c0808), #0c0808 70%); transition: background 0.8s; }
+
+    .blob {
+      position: absolute; border-radius: 9999px; filter: blur(90px);
+      opacity: 0.45; will-change: transform; transition: background-color 0.8s;
     }
-    .animate-bg-pan { animation: slowPan 28s ease-in-out infinite; }
+    .blob-1 { width: 55%; aspect-ratio: 1; left: -10%; top: -20%; background: var(--c1); animation: drift1 22s ease-in-out infinite alternate; }
+    .blob-2 { width: 50%; aspect-ratio: 1; right: -12%; top: 10%;  background: var(--c2); animation: drift2 26s ease-in-out infinite alternate; opacity: 0.35; }
+    .blob-3 { width: 60%; aspect-ratio: 1; left: 25%;  bottom: -35%; background: var(--c3); animation: drift3 30s ease-in-out infinite alternate; }
+    @keyframes drift1 { to { transform: translate(18%, 22%) scale(1.15); } }
+    @keyframes drift2 { to { transform: translate(-22%, 18%) scale(0.9); } }
+    @keyframes drift3 { to { transform: translate(-15%, -20%) scale(1.1); } }
+
+    .wave {
+      position: absolute; left: 0; bottom: 0; width: 200%; will-change: transform;
+      animation: waveFlow linear infinite;
+    }
+    .wave path { transition: fill 0.8s; }
+    .wave-1 { height: 46%; opacity: 0.30; animation-duration: 38s; }
+    .wave-2 { height: 36%; opacity: 0.35; animation-duration: 26s; animation-direction: reverse; }
+    .wave-3 { height: 24%; opacity: 0.45; animation-duration: 18s; }
+    .wave-1 path { fill: var(--c3); }
+    .wave-2 path { fill: var(--c1); }
+    .wave-3 path { fill: var(--c2); }
+    @keyframes waveFlow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Phones: the card is tall and narrow, so size colour by height instead of width */
+    @media (max-width: 767px) {
+      .blob   { filter: blur(70px); opacity: 0.5; }
+      .blob-1 { width: 130%; left: -40%; top: -4%; }
+      .blob-2 { width: 120%; right: -50%; top: 28%; }
+      .blob-3 { width: 140%; left: -20%; bottom: -8%; }
+      .wave-1 { height: 380px; width: 400%; }
+      .wave-2 { height: 290px; width: 400%; }
+      .wave-3 { height: 200px; width: 400%; }
+    }
 
     /* Cross-fade between booking steps */
     .step-page {
@@ -62,7 +99,7 @@
     input[type="date"] { color-scheme: dark; }
 
     @media (prefers-reduced-motion: reduce) {
-      .animate-bg-pan { animation: none; }
+      .blob, .wave { animation: none !important; }
       .step-page, #sliderThumb { transition: none !important; }
     }
   </style>
@@ -70,29 +107,25 @@
 <body class="min-h-screen md:h-screen w-full text-[#F5EFE6] font-sans-custom antialiased md:overflow-hidden p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
   <!-- MAIN EDITORIAL CARD FRAME -->
-  <main class="relative w-full md:h-full max-w-[1300px] md:max-h-[820px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col md:flex-row bg-[#100B0B]">
+  <main data-theme="ember" class="relative w-full md:h-full max-w-[1300px] md:max-h-[820px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col md:flex-row bg-[#100B0B]">
 
-    <!-- Background photo with gradient fades -->
-    <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      <img
-        id="bgDrumlineImg"
-        src="https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=2000&q=85"
-        alt=""
-        decoding="async"
-        fetchpriority="high"
-        class="w-full h-full object-cover object-center opacity-45 sepia-[.2] contrast-125 brightness-90 animate-bg-pan transition-opacity duration-500"
-      />
-      <div class="absolute inset-0 bg-gradient-to-r from-[#0C0808]/95 via-[#120D0D]/60 to-transparent"></div>
-      <div class="absolute inset-0 bg-gradient-to-t from-[#0C0808] via-transparent to-[#0C0808]/80"></div>
-      <div class="absolute -top-32 -left-32 w-[500px] h-[500px] bg-red-600/15 rounded-full blur-[140px]"></div>
-      <div class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[160px]"></div>
+    <!-- Animated gradient-wave background -->
+    <div class="bg-waves absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+      <svg class="wave wave-1" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 160 C 240 80, 480 80, 720 160 S 1200 240, 1440 160 S 1920 80, 2160 160 S 2640 240, 2880 160 V 320 H 0 Z"/></svg>
+      <svg class="wave wave-2" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 160 C 240 80, 480 80, 720 160 S 1200 240, 1440 160 S 1920 80, 2160 160 S 2640 240, 2880 160 V 320 H 0 Z"/></svg>
+      <svg class="wave wave-3" viewBox="0 0 2880 320" preserveAspectRatio="none"><path d="M0 160 C 240 80, 480 80, 720 160 S 1200 240, 1440 160 S 1920 80, 2160 160 S 2640 240, 2880 160 V 320 H 0 Z"/></svg>
+      <!-- Darken behind the headline so text stays readable -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#0C0808]/85 via-[#0C0808]/35 to-transparent"></div>
       <div class="absolute inset-0 film-grain"></div>
     </div>
 
-    <!-- Background switcher -->
+    <!-- Colour theme switcher -->
     <div class="absolute top-4 right-5 z-30">
-      <button type="button" id="bgSwitchBtn" class="px-3.5 py-1.5 rounded-full bg-black/50 hover:bg-black/70 border border-red-500/30 text-[10px] font-medium text-red-200/90 backdrop-blur-md transition flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400" aria-label="Switch background photo">
-        <span aria-hidden="true">🥁</span> <span id="bgLabel">Collegiate Line</span>
+      <button type="button" id="bgSwitchBtn" class="px-3.5 py-1.5 rounded-full bg-black/50 hover:bg-black/70 border border-red-500/30 text-[10px] font-medium text-red-200/90 backdrop-blur-md transition flex items-center gap-1.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400" aria-label="Change colour theme">
+        <span aria-hidden="true">🎨</span> <span id="bgLabel">Ember</span>
       </button>
     </div>
 
@@ -339,10 +372,13 @@
       },
     };
 
-    const drumlineBgs = [
-      { label: 'Collegiate Line', url: 'https://images.unsplash.com/photo-1519892300165-cb5542fb47c7?auto=format&fit=crop&w=2000&q=85' },
-      { label: 'Stadium View',    url: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=2000&q=85' },
+    // Colour themes for the wave background (colours live in the CSS, keyed by id)
+    const themes = [
+      { id: 'ember',    label: 'Ember' },
+      { id: 'sunset',   label: 'Sunset' },
+      { id: 'midnight', label: 'Midnight' },
     ];
+    const THEME_KEY = 'bd-theme';
 
     /* ---------------- State ---------------- */
     const initialState = () => ({
@@ -765,26 +801,23 @@
       setInstrumentStop(0);
     }
 
-    /* ---------------- Background switcher ---------------- */
-    let bgIndex = 0;
-    // Preload the alternates so swapping doesn't flash an empty frame
-    drumlineBgs.slice(1).forEach((bg) => { new Image().src = bg.url; });
+    /* ---------------- Colour theme switcher ---------------- */
+    let themeIndex = 0;
 
-    function cycleDrumlineBg() {
-      bgIndex = (bgIndex + 1) % drumlineBgs.length;
-      const next = drumlineBgs[bgIndex];
-      const img = $('bgDrumlineImg');
-      img.style.opacity = '0.1';
-      const loader = new Image();
-      loader.onload = loader.onerror = () => {
-        setTimeout(() => {
-          img.src = next.url;
-          img.style.opacity = '';
-          $('bgLabel').textContent = next.label;
-        }, 250);
-      };
-      loader.src = next.url;
+    function applyTheme(index) {
+      themeIndex = (index + themes.length) % themes.length;
+      const t = themes[themeIndex];
+      document.querySelector('main').dataset.theme = t.id;
+      $('bgLabel').textContent = t.label;
+      try { localStorage.setItem(THEME_KEY, t.id); } catch (_) {}
     }
+
+    function cycleTheme() { applyTheme(themeIndex + 1); }
+
+    try {
+      const saved = themes.findIndex((t) => t.id === localStorage.getItem(THEME_KEY));
+      if (saved > 0) applyTheme(saved);
+    } catch (_) {}
 
     /* ---------------- Explore button ---------------- */
     function highlightServices() {
@@ -817,7 +850,7 @@
 
     $('page3').addEventListener('submit', submitBooking);
     $('bookAnotherBtn').addEventListener('click', resetBooking);
-    $('bgSwitchBtn').addEventListener('click', cycleDrumlineBg);
+    $('bgSwitchBtn').addEventListener('click', cycleTheme);
     $('exploreBtn').addEventListener('click', highlightServices);
 
     updateSubmitState();
