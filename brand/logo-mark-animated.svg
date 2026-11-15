@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<title>Boston Drumming Co.</title>
+<defs>
+  <linearGradient id="bda-rg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#EF4444"/><stop offset="1" stop-color="#F59E0B"/>
+  </linearGradient>
+  <linearGradient id="bda-gold" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#FCD34D"/><stop offset=".5" stop-color="#FBBF24"/><stop offset="1" stop-color="#F59E0B"/>
+  </linearGradient>
+  <clipPath id="bda-clip"><circle cx="256" cy="256" r="238"/></clipPath>
+  <radialGradient id="bda-glow" cx=".3" cy=".25" r=".6"><stop offset="0" stop-color="#DC2626" stop-opacity=".55"/><stop offset="1" stop-color="#DC2626" stop-opacity="0"/></radialGradient>
+</defs>
+<style>
+  .w { animation: flow linear infinite; }
+  .w1 { animation-duration: 11s; }
+  .w2 { animation-duration: 8s; animation-direction: reverse; }
+  .w3 { animation-duration: 6s; }
+  @keyframes flow { from { transform: translateX(0); } to { transform: translateX(-512px); } }
+  .glow { animation: drift 7s ease-in-out infinite alternate; }
+  @keyframes drift { to { transform: translate(60px, 40px); } }
+  @media (prefers-reduced-motion: reduce) { .w, .glow { animation: none; } }
+</style>
+<circle cx="256" cy="256" r="238" fill="#0C0808"/>
+<g clip-path="url(#bda-clip)">
+  <rect class="glow" x="-60" y="-60" width="632" height="632" fill="url(#bda-glow)"/>
+  <path class="w w1" d="M0 300 C 85 262, 171 262, 256 300 S 427 338, 512 300 S 683 262, 768 300 S 939 338, 1024 300 V 560 H 0 Z" fill="#7F1D1D"/>
+  <path class="w w2" d="M0 350 C 85 384, 171 384, 256 350 S 427 316, 512 350 S 683 384, 768 350 S 939 316, 1024 350 V 560 H 0 Z" fill="#DC2626"/>
+  <path class="w w3" d="M0 405 C 85 375, 171 375, 256 405 S 427 435, 512 405 S 683 375, 768 405 S 939 435, 1024 405 V 560 H 0 Z" fill="#F59E0B"/>
+</g>
+<line x1="150" y1="108" x2="318" y2="330" stroke="#F7F2DC" stroke-width="17" stroke-linecap="round"/><circle cx="150" cy="108" r="14.5" fill="#F7F2DC"/>
+<line x1="362" y1="108" x2="194" y2="330" stroke="#F7F2DC" stroke-width="17" stroke-linecap="round"/><circle cx="362" cy="108" r="14.5" fill="#F7F2DC"/>
+<circle cx="256" cy="256" r="236" fill="none" stroke="url(#bda-rg)" stroke-width="13"/>
+</svg>
