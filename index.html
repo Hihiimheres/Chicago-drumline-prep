@@ -65,7 +65,7 @@
     @keyframes waveFlow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
     /* Phones: the card is tall and narrow, so size colour by height instead of width */
-    @media (max-width: 767px) {
+    @media (max-width: 1023px) {
       .blob   { filter: blur(70px); opacity: 0.5; }
       .blob-1 { width: 130%; left: -40%; top: -4%; }
       .blob-2 { width: 120%; right: -50%; top: 28%; }
@@ -105,7 +105,7 @@
     }
   </style>
 </head>
-<body class="min-h-screen md:h-screen w-full text-[#F5EFE6] font-sans-custom antialiased md:overflow-hidden p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
+<body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
   <!-- MAIN EDITORIAL CARD FRAME -->
   <!-- Shown when Stripe sends the student back with ?paid=1 -->
@@ -115,7 +115,7 @@
     <button type="button" id="paidBannerClose" class="text-emerald-200 hover:text-white text-base leading-none" aria-label="Dismiss">×</button>
   </div>
 
-  <main data-theme="ember" class="relative w-full md:h-full max-w-[1300px] md:max-h-[820px] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col md:flex-row bg-[#100B0B]">
+  <main data-theme="ember" class="relative w-full max-w-[1300px] lg:min-h-[min(820px,calc(100vh-4rem))] rounded-[28px] sm:rounded-[36px] overflow-hidden border border-red-500/20 shadow-2xl flex flex-col lg:flex-row bg-[#100B0B]">
 
     <!-- Animated gradient-wave background -->
     <div class="bg-waves absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
@@ -138,7 +138,7 @@
     </div>
 
     <!-- LEFT COLUMN: Intro -->
-    <section class="relative z-10 w-full md:w-5/12 p-6 pt-16 sm:p-10 lg:p-12 flex flex-col justify-between gap-8 md:h-full md:overflow-y-auto [@media(min-width:768px)_and_(max-height:820px)]:py-7 [@media(min-width:768px)_and_(max-height:820px)]:gap-4">
+    <section class="relative z-10 w-full lg:w-5/12 p-6 pt-16 sm:p-10 sm:pt-16 lg:p-12 flex flex-col justify-between gap-8 [@media(min-width:1024px)_and_(max-height:820px)]:py-8 [@media(min-width:1024px)_and_(max-height:820px)]:gap-5">
 
       <div class="flex items-center gap-3">
         <div class="w-11 h-11 rounded-full bg-[#1C1212] border-2 border-red-500/50 flex items-center justify-center shadow-lg" aria-hidden="true">
@@ -150,8 +150,8 @@
         </div>
       </div>
 
-      <div class="md:my-auto py-2">
-        <h1 class="font-serif-custom text-5xl sm:text-6xl md:text-[clamp(44px,8vh,72px)] text-[#FDFBF7] leading-[0.96] tracking-tight mb-4">
+      <div class="lg:my-auto py-2">
+        <h1 class="font-serif-custom text-5xl sm:text-6xl lg:text-[clamp(52px,8.5vh,72px)] text-[#FDFBF7] leading-[0.96] tracking-tight mb-4">
           Learn,<br>
           practice,<br>
           <span class="italic bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-[0_2px_15px_rgba(251,191,36,0.35)]">play.</span>
@@ -166,7 +166,7 @@
           <p class="mt-1.5 text-[13px] text-stone-200/90 font-light leading-relaxed">
             I’ve been marching for 3 years, training with the bands at Alabama State University and Florida A&amp;M University and taking part in their band camps. I bring what I learned there to every lesson.
           </p>
-          <ul class="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium [@media(min-width:768px)_and_(max-height:720px)]:hidden">
+          <ul class="mt-3 flex flex-wrap gap-1.5 text-[10px] font-medium">
             <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">3 years marching</li>
             <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">Alabama State</li>
             <li class="px-2.5 py-1 rounded-full bg-white/[0.06] border border-white/10 text-stone-200">Florida A&amp;M</li>
@@ -186,7 +186,7 @@
     </section>
 
     <!-- RIGHT COLUMN: Booking panel -->
-    <section class="relative z-10 w-full md:w-7/12 p-4 sm:p-8 lg:p-10 flex justify-center md:h-full md:overflow-y-auto" aria-labelledby="bookingTitle">
+    <section class="relative z-10 w-full lg:w-7/12 p-4 sm:p-8 lg:p-10 flex justify-center" aria-labelledby="bookingTitle">
 
       <div id="bookingPanel" class="my-auto w-full max-w-[500px] bg-[#140D0D]/90 border border-red-500/25 rounded-[30px] p-5 sm:p-7 backdrop-blur-xl shadow-2xl transition-all duration-300 flex flex-row gap-3 sm:gap-4 items-stretch scroll-mt-4">
 
@@ -945,7 +945,7 @@
     function highlightServices() {
       goToPage(1);
       const panel = $('bookingPanel');
-      if (window.matchMedia('(max-width: 767px)').matches) {
+      if (window.matchMedia('(max-width: 1023px)').matches) {
         panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       panel.classList.add('ring-2', 'ring-red-500/60');
