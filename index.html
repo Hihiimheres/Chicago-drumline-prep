@@ -104,6 +104,24 @@
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
   <!-- MAIN EDITORIAL CARD FRAME -->
+  <!-- Cancellation & refund policy (opened from the footer and the booking form) -->
+  <dialog id="policyDialog" aria-labelledby="policyTitle" class="w-[calc(100%-2rem)] max-w-md p-0 rounded-3xl bg-[#140D0D] text-[#F5EFE6] border border-red-500/30 shadow-2xl backdrop:bg-black/70 backdrop:backdrop-blur-sm">
+    <div class="p-6 sm:p-7 space-y-4">
+      <div class="flex items-start justify-between gap-4">
+        <h2 id="policyTitle" class="font-serif-custom text-3xl leading-none">Cancellation &amp; refunds</h2>
+        <button type="button" id="policyClose" class="text-stone-400 hover:text-white text-2xl leading-none -mt-1" aria-label="Close">×</button>
+      </div>
+      <ul class="space-y-3 text-sm text-stone-200 font-light leading-relaxed">
+        <li class="flex gap-3"><span aria-hidden="true">✅</span><span><strong class="font-semibold text-white">Cancel at least 24 hours before your lesson</strong> and you’ll get a full refund.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
+      </ul>
+      <button type="button" id="policyOk" class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider">Got it</button>
+    </div>
+  </dialog>
+
   <!-- Shown when Stripe sends the student back with ?paid=1 -->
   <div id="paidBanner" role="status" hidden class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-4 py-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 backdrop-blur-xl text-emerald-100 text-xs font-medium shadow-2xl flex items-center gap-3">
     <span class="text-lg" aria-hidden="true">✅</span>
@@ -175,7 +193,10 @@
 
       <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
         <span>✦ Snare / Tenors / Bass / Cymbals</span>
-        <a id="questionsLink" href="mailto:Boston.drumming@icloud.com" class="text-red-400/90 font-medium hover:text-red-300 hover:underline">Questions? Email me →</a>
+        <span class="flex items-center gap-3">
+          <button type="button" data-open-policy class="text-stone-300 hover:text-white hover:underline">Cancellation &amp; refunds</button>
+          <a id="questionsLink" href="mailto:Boston.drumming@icloud.com" class="text-red-400/90 font-medium hover:text-red-300 hover:underline">Questions? Email me →</a>
+        </span>
       </div>
     </section>
 
@@ -284,6 +305,7 @@
               <!-- Spam trap: hidden from people, bots tend to fill it in -->
               <input type="text" id="hpField" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
+              <p class="text-[10px] text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white">See policy</button></p>
               <button type="submit" id="submitBtn" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">
                 Pick a date &amp; add email or phone
               </button>
@@ -1003,6 +1025,11 @@
     document.querySelectorAll('[data-pay]').forEach((b) =>
       b.addEventListener('click', () => { state.pay = b.dataset.pay; syncPayChoice(); }));
     $('paidBannerClose').addEventListener('click', () => { $('paidBanner').hidden = true; });
+    document.querySelectorAll('[data-open-policy]').forEach((b) =>
+      b.addEventListener('click', () => $('policyDialog').showModal()));
+    ['policyClose', 'policyOk'].forEach((id) => $(id).addEventListener('click', () => $('policyDialog').close()));
+    // Close when tapping the dark area around the dialog
+    $('policyDialog').addEventListener('click', (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
     syncPayChoice();
     showPaidBannerIfReturning();
 
