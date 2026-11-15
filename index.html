@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Boston Drumming — snare, tenor, bass and cymbal lessons in the Chicagoland area and online. Book a session in under a minute.">
   <meta name="theme-color" content="#100B0B">
+  <!-- Bump on every update: open pages compare this with the published copy and refresh -->
+  <meta name="site-version" content="2026-11-15.2">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" href="brand/logo-mark.png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
@@ -99,7 +101,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-15.2">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -1459,6 +1461,45 @@
 
     updateSubmitState();
     goToPage(1, { focus: false });
+
+    /* ---------------- Stay up to date ----------------
+       Phones often restore an old copy of an open tab. When the page is opened or comes back
+       to the foreground, check the published copy; if it's newer, reload (or, mid-booking,
+       offer a Refresh button so nothing typed is lost). */
+    (function keepFresh() {
+      const mine = document.querySelector('meta[name="site-version"]')?.content;
+      if (!mine || location.protocol === 'file:') return;
+      let lastCheck = 0;
+
+      const busy = () => state.page > 1 || [...document.querySelectorAll('dialog')].some((d) => d.open);
+
+      function offerRefresh() {
+        if ($('updateBanner')) return;
+        const bar = el('div', 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-4 py-3 rounded-2xl bg-[#1C1212]/95 border border-amber-400/40 backdrop-blur-xl text-amber-100 text-xs font-medium shadow-2xl flex items-center gap-3');
+        bar.id = 'updateBanner';
+        bar.setAttribute('role', 'status');
+        const btn = el('button', 'shrink-0 px-3 py-1.5 rounded-full bg-[#F7F2DC] text-[#14120E] font-bold', 'Refresh');
+        btn.type = 'button';
+        btn.addEventListener('click', () => location.reload());
+        bar.append(el('span', 'flex-1', 'A newer version of this page is available.'), btn);
+        document.body.append(bar);
+      }
+
+      async function check() {
+        if (Date.now() - lastCheck < 30000) return;
+        lastCheck = Date.now();
+        try {
+          const res = await fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' });
+          const live = (await res.text()).match(/<meta name="site-version" content="([^"]+)"/);
+          if (!live || live[1] === mine) return;
+          if (busy()) offerRefresh(); else location.reload();
+        } catch (_) { /* offline: try again next time */ }
+      }
+
+      setTimeout(check, 1500);
+      window.addEventListener('pageshow', (e) => { if (e.persisted) { lastCheck = 0; check(); } });
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    })();
   </script>
 </body>
 </html>

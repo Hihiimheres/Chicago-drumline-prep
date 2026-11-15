@@ -29,3 +29,9 @@ npm run build:css  # writes assets/site.css
 ```
 
 Commit `assets/site.css` together with `index.html`.
+
+## Publishing an update
+
+Change the `site-version` meta tag (and the matching `?v=` on the stylesheet link) in `index.html`
+on every update. Pages that visitors already have open compare it with the published copy and
+refresh themselves (or show a Refresh button if someone is mid-booking).
