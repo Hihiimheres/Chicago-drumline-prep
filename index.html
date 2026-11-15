@@ -22,9 +22,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <!-- Tailwind Play CDN is fine for prototyping; for production, compile Tailwind to a static CSS file. -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
   <style>
     .font-serif-custom { font-family: 'Instrument Serif', serif; }
     .font-sans-custom  { font-family: 'Plus Jakarta Sans', sans-serif; }
@@ -100,6 +97,9 @@
       #sliderThumb, #hThumb { transition: none !important; }
     }
   </style>
+
+  <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
+  <link rel="stylesheet" href="assets/site.css">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-3 sm:p-5 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -261,7 +261,7 @@
               <div>
                 <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
                 <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                <p id="availHint" class="mt-1 text-[10px] text-stone-400">Weekends: any time · Weekdays: after 5:00 PM</p>
+                <p id="availHint" class="mt-1 text-[10px] text-stone-400">Book at least a day ahead · Weekends: any time · Weekdays: after 5:00 PM</p>
               </div>
 
               <div role="group" aria-labelledby="timeLabel">
@@ -527,11 +527,14 @@
     const $ = (id) => document.getElementById(id);
 
     /* ---------------- Helpers ---------------- */
-    function todayISO() {
+    // Local date as YYYY-MM-DD, `days` from today
+    function isoDaysFromToday(days = 0) {
       const d = new Date();
+      d.setDate(d.getDate() + days);
       d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); // local date, not UTC
       return d.toISOString().slice(0, 10);
     }
+    const earliestBookingISO = () => isoDaysFromToday(1); // lessons are booked at least a day ahead
 
     function formatDate(iso) {
       if (!iso) return '';
@@ -933,7 +936,7 @@
       const btn = $('submitBtn');
       const hint = $('contactHint');
       const problem = contactProblem();
-      const dateOk = state.date && state.date >= todayISO();
+      const dateOk = state.date && state.date >= earliestBookingISO();
       const touched = state.email || state.phone;
 
       hint.textContent = touched && problem ? problem : 'Email or phone, whichever you prefer.';
@@ -946,7 +949,8 @@
       btn.disabled = !ready;
       const fee = needsAddress() && travel.status === 'ok' ? travel.fee : 0;
       btn.textContent = ready ? `Request ${formatDate(state.date)} • $${state.rate.price}${fee ? ` + $${fee} travel` : ''}`
-        : !dateOk ? 'Pick a date to continue'
+        : !state.date ? 'Pick a date to continue'
+        : !dateOk ? 'Pick a date from tomorrow on'
         : !nameOk ? 'Add your first and last name'
         : problem ? 'Add email or phone to continue'
         : !addressOk() ? 'Add the lesson address'
@@ -1074,7 +1078,7 @@
       state = initialState();
       state.instIndex = keepInst;
       $('page3').reset();
-      $('sessionDateInput').min = todayISO();
+      $('sessionDateInput').min = earliestBookingISO();
       $('rememberMe').checked = true;
       loadSavedContact();
       renderTimeChips();
@@ -1237,7 +1241,7 @@
     /* ---------------- Wire up ---------------- */
     renderFormats();
     initSlider();
-    $('sessionDateInput').min = todayISO();
+    $('sessionDateInput').min = earliestBookingISO();
     renderTimeChips();
     loadSavedContact();
     $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;

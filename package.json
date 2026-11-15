@@ -1,0 +1,11 @@
+{
+  "name": "boston-drumming-site",
+  "private": true,
+  "description": "Boston Drumming Co. booking site (static, served by GitHub Pages)",
+  "scripts": {
+    "build:css": "tailwindcss -i src/tailwind.css -o assets/site.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}
