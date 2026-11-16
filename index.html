@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.5">
+  <meta name="site-version" content="2026-11-16.6">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -203,7 +203,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.5">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.6">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -837,17 +837,41 @@
       syncPayChoice();
       const container = $('rateButtonsContainer');
       container.replaceChildren();
-      let planHeading = false;
-      f.rates.forEach((r) => {
-        if (r.plan && !planHeading) {
-          planHeading = true;
-          const h = el('div', 'pt-3');
-          h.append(
-            el('p', 'text-xs text-stone-300 font-medium', 'Weekly plans · save 10%'),
-            el('p', 'text-[11px] text-stone-400', '4 lessons a month, one a week. Billed monthly, cancel anytime.'),
-          );
-          container.append(h);
+      // Formats with plans get a "Per session | Subscription" pill switch; only the chosen group shows
+      const hasPlans = f.rates.some((r) => r.plan);
+      const groups = { single: el('div', 'space-y-2.5'), plan: el('div', 'space-y-2.5') };
+      if (hasPlans) {
+        const sw = el('div', 'grid grid-cols-2 p-1 rounded-full bg-white/[0.04] border border-white/10');
+        sw.setAttribute('role', 'group');
+        sw.setAttribute('aria-label', 'Pay per session or subscribe');
+        const modes = [['single', 'Per session', ''], ['plan', 'Subscription', 'Save 10%']];
+        const pills = modes.map(([mode, text, badge]) => {
+          const b = el('button', '');
+          b.type = 'button';
+          b.dataset.rateMode = mode;
+          b.append(text);
+          if (badge) b.append(el('span', 'ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold align-middle', badge));
+          b.addEventListener('click', () => showMode(mode));
+          sw.append(b);
+          return b;
+        });
+        const note = el('p', 'text-[11px] text-stone-400 -mt-0.5');
+        function showMode(mode) {
+          pills.forEach((b) => {
+            const on = b.dataset.rateMode === mode;
+            b.className = 'py-2.5 rounded-full text-[13px] font-semibold transition ' +
+              (on ? 'bg-gradient-to-r from-red-500 to-amber-500 text-white shadow-[0_2px_12px_rgba(239,68,68,0.35)]' : 'text-stone-400 hover:text-stone-200');
+            b.setAttribute('aria-pressed', on);
+          });
+          groups.single.hidden = mode !== 'single';
+          groups.plan.hidden = mode !== 'plan';
+          note.textContent = mode === 'plan' ? '4 lessons a month, one a week. Billed monthly, cancel anytime.' : 'Pay for one lesson at a time.';
         }
+        container.append(sw, note);
+        showMode('single');
+      }
+      container.append(groups.single, groups.plan);
+      f.rates.forEach((r) => {
         const btn = el('button', 'rate-btn w-full px-5 py-5 sm:py-4 rounded-2xl border transition flex items-center justify-between gap-3 ' +
           (r.plan ? 'border-amber-400/30 bg-amber-400/[0.06] hover:border-amber-300' : 'border-white/10 bg-white/[0.03] hover:border-red-400'));
         btn.type = 'button';
@@ -857,7 +881,7 @@
         if (r.plan) label.append(el('span', 'block text-[11px] text-amber-200/80', `4 lessons for $${r.price} (instead of $${r.single * 4})`));
         btn.append(label, el('span', 'shrink-0 text-xl sm:text-base font-extrabold ' + (r.plan ? 'text-amber-200' : 'text-red-300'), `${priceLabel(r)} →`));
         btn.addEventListener('click', () => chooseRate(r, btn));
-        container.append(btn);
+        groups[r.plan ? 'plan' : 'single'].append(btn);
       });
 
       updateSubmitState();
