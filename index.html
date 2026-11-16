@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.14">
+  <meta name="site-version" content="2026-11-16.15">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -188,6 +188,13 @@
 
     [hidden] { display: none !important; }
 
+    /* Per session | Subscription switch: sliding knob, options glide in */
+    .mode-knob { transition: transform .35s cubic-bezier(.3,1.25,.5,1); }
+    .slide-from-right { animation: slideFromRight .35s cubic-bezier(.2,.8,.2,1); }
+    .slide-from-left  { animation: slideFromLeft .35s cubic-bezier(.2,.8,.2,1); }
+    @keyframes slideFromRight { from { opacity: 0; transform: translateX(28px); } }
+    @keyframes slideFromLeft  { from { opacity: 0; transform: translateX(-28px); } }
+
 
     /* Full-screen on phones and tablets: pad for the notch and home-bar area (0 on computers) */
     main { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
@@ -209,12 +216,13 @@
     @media (prefers-reduced-motion: reduce) {
       .blob, .wave { animation: none !important; }
       .step-enter { animation: none !important; }
-      #hThumb { transition: none !important; }
+      #hThumb, .mode-knob { transition: none !important; }
+      .slide-from-left, .slide-from-right { animation: none !important; }
     }
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.14">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.15">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -882,32 +890,59 @@
       const hasPlans = f.rates.some((r) => r.plan);
       const groups = { single: el('div', 'space-y-2.5'), plan: el('div', 'space-y-2.5') };
       if (hasPlans) {
-        const sw = el('div', 'grid grid-cols-2 p-1 rounded-full bg-white/[0.04] border border-white/10');
+        // Two-option switch with one gradient pill that slides between the options
+        const sw = el('div', 'relative grid grid-cols-2 p-1 rounded-full bg-white/[0.04] border border-white/10');
         sw.setAttribute('role', 'group');
         sw.setAttribute('aria-label', 'Pay per session or subscribe');
+        sw.style.touchAction = 'pan-y'; // let sideways swipes reach the switch instead of scrolling
+        const knob = el('div', 'mode-knob accent-grad absolute top-1 bottom-1 left-1 rounded-full shadow-[0_2px_12px_rgba(239,68,68,0.35)]');
+        knob.setAttribute('aria-hidden', 'true');
+        sw.append(knob);
         const modes = [['single', 'Per session', ''], ['plan', 'Subscription', 'Save 10%']];
         const pills = modes.map(([mode, text, badge]) => {
-          const b = el('button', '');
+          const b = el('button', 'relative z-10 py-2.5 rounded-full text-[13px] font-semibold transition-colors duration-300');
           b.type = 'button';
           b.dataset.rateMode = mode;
           b.append(text);
-          if (badge) b.append(el('span', 'ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold align-middle', badge));
+          if (badge) b.append(el('span', 'ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold align-middle transition-colors duration-300', badge));
           b.addEventListener('click', () => showMode(mode));
           sw.append(b);
           return b;
         });
         const note = el('p', 'text-[11px] text-stone-400 -mt-0.5');
+        let current = null;
         function showMode(mode) {
+          if (mode === current) return;
+          const first = current === null;
+          current = mode;
+          const i = mode === 'plan' ? 1 : 0;
+          knob.style.width = 'calc(50% - 4px)';
+          knob.style.transform = `translateX(${i * 100}%)`;
           pills.forEach((b) => {
             const on = b.dataset.rateMode === mode;
-            b.className = 'py-2.5 rounded-full text-[13px] font-semibold transition ' +
-              (on ? 'accent-grad text-white shadow-[0_2px_12px_rgba(239,68,68,0.35)]' : 'text-stone-400 hover:text-stone-200');
+            b.classList.toggle('text-white', on);
+            b.classList.toggle('text-stone-400', !on);
             b.setAttribute('aria-pressed', on);
           });
           groups.single.hidden = mode !== 'single';
           groups.plan.hidden = mode !== 'plan';
+          // the new options glide in from the side the knob moved towards
+          if (!first) {
+            const g = groups[mode];
+            g.classList.remove('slide-from-left', 'slide-from-right');
+            void g.offsetWidth;
+            g.classList.add(mode === 'plan' ? 'slide-from-right' : 'slide-from-left');
+          }
           note.textContent = mode === 'plan' ? '4 lessons a month, one a week. Billed monthly, cancel anytime.' : 'Pay for one lesson at a time.';
         }
+        // swipe left/right on the switch to change it
+        let startX = null;
+        sw.addEventListener('pointerdown', (e) => { startX = e.clientX; });
+        sw.addEventListener('pointerup', (e) => {
+          if (startX === null) return;
+          const dx = e.clientX - startX; startX = null;
+          if (Math.abs(dx) > 30) showMode(dx < 0 ? 'single' : 'plan');
+        });
         container.append(sw, note);
         showMode(CONFIG.defaultRateMode === 'plan' ? 'plan' : 'single');
       }
