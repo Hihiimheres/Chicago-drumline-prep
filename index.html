@@ -7,9 +7,10 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.3">
+  <meta name="site-version" content="2026-11-16.4">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
-  <link rel="icon" type="image/png" href="brand/logo-mark.png">
+  <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
+  <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Boston Drumming Co. — Learn. Practice. Play.">
@@ -93,11 +94,20 @@
   }
   </script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Fonts are served from this site (assets/fonts, SIL Open Font License); the two used first are fetched early -->
+  <link rel="preload" href="assets/fonts/instrument-serif-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 
   <style>
+    @font-face { font-family: 'Instrument Serif'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/instrument-serif-latin-400-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Instrument Serif'; font-style: italic; font-weight: 400; font-display: swap; src: url(assets/fonts/instrument-serif-latin-400-italic.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 300; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-300-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-400-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-500-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-600-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-700-normal.woff2) format('woff2'); }
+    @font-face { font-family: 'Plus Jakarta Sans'; font-style: normal; font-weight: 800; font-display: swap; src: url(assets/fonts/plus-jakarta-sans-latin-800-normal.woff2) format('woff2'); }
+
     .font-serif-custom { font-family: 'Instrument Serif', serif; }
     .font-sans-custom  { font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -190,7 +200,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.3">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.4">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -1509,7 +1519,7 @@
     updateSubmitState();
     goToPage(1, { focus: false });
 
-    /* ---------------- Stay up to date ----------------
+    /* ---------------- Stay up to date (version.txt must match the site-version meta tag) ----------------
        Phones often restore an old copy of an open tab. When the page is opened or comes back
        to the foreground, check the published copy; if it's newer, reload (or, mid-booking,
        offer a Refresh button so nothing typed is lost). */
@@ -1536,10 +1546,18 @@
         if (Date.now() - lastCheck < 30000) return;
         lastCheck = Date.now();
         try {
-          const res = await fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' });
-          const live = (await res.text()).match(/<meta name="site-version" content="([^"]+)"/);
-          if (!live || live[1] === mine) return;
-          if (busy()) offerRefresh(); else location.reload();
+          // version.txt is a few bytes, so this doesn't re-download the page on every visit
+          const res = await fetch('version.txt?check=' + Date.now(), { cache: 'no-store' });
+          if (!res.ok) return;
+          const live = (await res.text()).trim();
+          if (!live || live === mine) return;
+          if (busy()) { offerRefresh(); return; }
+          // Safety net: reload at most once per published version, so a mismatch can't loop
+          let reloadedFor = null;
+          try { reloadedFor = sessionStorage.getItem('bd-reloaded-for'); } catch (_) {}
+          if (reloadedFor === live) return;
+          try { sessionStorage.setItem('bd-reloaded-for', live); } catch (_) {}
+          location.reload();
         } catch (_) { /* offline: try again next time */ }
       }
 
