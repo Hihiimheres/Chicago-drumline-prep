@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="bg-[#050404]">
+<html lang="en" class="bg-[#050404]" data-theme="ember">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.9">
+  <meta name="site-version" content="2026-11-16.10">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -120,10 +120,20 @@
     }
 
     /* ---- Animated gradient-wave background ----
-       Colours come from --c1/--c2/--c3, set per theme on <main data-theme="..."> */
-    main[data-theme="ember"]    { --c1: #dc2626; --c2: #f59e0b; --c3: #7f1d1d; }
-    main[data-theme="sunset"]   { --c1: #e11d48; --c2: #fb923c; --c3: #7c3aed; }
-    main[data-theme="midnight"] { --c1: #4f46e5; --c2: #c026d3; --c3: #0e7490; }
+       Colours come from --c1/--c2/--c3, set per theme on <html> and <main data-theme="..."> */
+    [data-theme="ember"]    { --c1: #dc2626; --c2: #f59e0b; --c3: #7f1d1d; }
+    [data-theme="sunset"]   { --c1: #e11d48; --c2: #fb923c; --c3: #7c3aed; }
+    [data-theme="midnight"] { --c1: #4f46e5; --c2: #c026d3; --c3: #0e7490; }
+
+    /* Buttons and highlights follow the colour theme */
+    .accent-grad { background-image: linear-gradient(90deg, var(--c1), var(--c2)); }
+    .btn-accent {
+      background-image: linear-gradient(90deg, var(--c1), var(--c2)); color: #fff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, .25);
+      box-shadow: 0 6px 22px -6px color-mix(in srgb, var(--c1) 60%, transparent);
+      transition: filter .2s, opacity .2s, transform .15s;
+    }
+    .btn-accent:hover:not(:disabled) { filter: brightness(1.1); }
 
     .bg-waves { background: radial-gradient(120% 90% at 80% 100%, color-mix(in srgb, var(--c3) 35%, #0c0808), #0c0808 70%); transition: background 0.8s; }
 
@@ -203,7 +213,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.9">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.10">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -223,7 +233,7 @@
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
       </ul>
-      <button type="button" id="policyOk" class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider">Got it</button>
+      <button type="button" id="policyOk" class="w-full py-3 rounded-full btn-accent font-bold text-xs uppercase tracking-wider">Got it</button>
     </div>
   </dialog>
 
@@ -251,13 +261,13 @@
           <input type="checkbox" id="reviewConsent" checked class="accent-red-500 w-3.5 h-3.5 mt-0.5"> It’s OK to show my review and first name on the website
         </label>
         <input type="text" id="reviewHp" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
-        <button type="submit" id="reviewSubmit" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider disabled:opacity-35 disabled:cursor-not-allowed">Pick a rating</button>
+        <button type="submit" id="reviewSubmit" disabled class="w-full py-3 rounded-full btn-accent font-bold text-xs uppercase tracking-wider disabled:opacity-35 disabled:cursor-not-allowed">Pick a rating</button>
         <p id="reviewError" class="hidden text-[11px] text-red-300 text-center" role="alert"></p>
       </div>
       <div id="reviewThanks" class="space-y-3 text-center" hidden>
         <p class="text-4xl" aria-hidden="true">🥁</p>
         <p class="text-sm text-stone-200">Thank you! Your review was sent.</p>
-        <button type="button" data-close-dialog class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider">Close</button>
+        <button type="button" data-close-dialog class="w-full py-3 rounded-full btn-accent font-bold text-xs uppercase tracking-wider">Close</button>
       </div>
     </form>
   </dialog>
@@ -335,7 +345,7 @@
           <div id="reviewsList" class="space-y-2"></div>
         </div>
 
-        <button type="button" id="exploreBtn" class="px-7 py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs tracking-wide shadow-xl transition transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">
+        <button type="button" id="exploreBtn" class="px-7 py-3 rounded-full btn-accent font-bold text-xs tracking-wide shadow-xl transition transform active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-300">
           Explore my services
         </button>
       </div>
@@ -376,7 +386,7 @@
           <div class="mb-4">
             <span id="hRailLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Instrument focus</span>
             <div id="hRail" role="radiogroup" aria-labelledby="hRailLabel" class="relative grid grid-cols-4 p-1 rounded-full bg-white/[0.04] border border-white/10 select-none">
-              <div id="hThumb" aria-hidden="true" class="absolute top-1 bottom-1 left-0 rounded-full bg-gradient-to-r from-red-500 to-amber-500 shadow-[0_2px_12px_rgba(239,68,68,0.4)] transition-transform duration-200 ease-out"></div>
+              <div id="hThumb" aria-hidden="true" class="absolute top-1 bottom-1 left-0 rounded-full accent-grad shadow-[0_2px_12px_rgba(239,68,68,0.4)] transition-transform duration-200 ease-out"></div>
               <!-- Buttons are rendered from the `instruments` array -->
             </div>
           </div>
@@ -432,7 +442,7 @@
                 <div id="travelInfo" role="status" aria-live="polite" class="text-sm rounded-xl px-3 py-2 border border-white/10 bg-white/[0.03] text-stone-300" hidden></div>
               </fieldset>
 
-              <button type="button" id="nextBtn" disabled class="w-full py-4 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">Pick a date to continue</button>
+              <button type="button" id="nextBtn" disabled class="w-full py-4 rounded-full btn-accent font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed transition transform active:scale-[0.98]">Pick a date to continue</button>
             </div>
 
             <!-- PAGE 4: Your details -->
@@ -496,7 +506,7 @@
               <input type="text" id="hpField" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
               <div class="space-y-2">
-                <button type="submit" id="submitBtn" data-pay="online" disabled class="w-full py-4 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">Add your first and last name</button>
+                <button type="submit" id="submitBtn" data-pay="online" disabled class="w-full py-4 rounded-full btn-accent font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed transition transform active:scale-[0.98]">Add your first and last name</button>
                 <button type="submit" id="submitLessonBtn" data-pay="lesson" class="w-full py-4 rounded-full border border-white/20 bg-white/[0.04] hover:border-amber-300/60 text-[#F7F2DC] font-bold text-sm uppercase tracking-wider transition transform active:scale-[0.98]" hidden>Request · pay at the lesson</button>
               </div>
               <p class="text-xs text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white">See policy</button></p>
@@ -543,7 +553,7 @@
               <p id="successMsg" class="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-[11px] text-red-200 text-center font-medium"></p>
 
               <div id="payBlock" class="space-y-1.5" hidden>
-                <a id="payBtn" href="#" class="block w-full text-center py-3 rounded-full bg-gradient-to-r from-red-500 to-amber-500 hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_18px_rgba(239,68,68,0.35)] transition transform active:scale-[0.98]">Pay securely →</a>
+                <a id="payBtn" href="#" class="block w-full text-center py-3 rounded-full accent-grad hover:brightness-110 text-white font-bold text-xs uppercase tracking-wider shadow-[0_4px_18px_rgba(239,68,68,0.35)] transition transform active:scale-[0.98]">Pay securely →</a>
                 <p class="text-[10px] text-stone-400 text-center">🔒 Secure checkout by Stripe · Card, Apple Pay, Google Pay</p>
               </div>
               <p id="bookingRef" class="text-[10px] text-stone-500 text-center"></p>
@@ -866,7 +876,7 @@
           pills.forEach((b) => {
             const on = b.dataset.rateMode === mode;
             b.className = 'py-2.5 rounded-full text-[13px] font-semibold transition ' +
-              (on ? 'bg-gradient-to-r from-red-500 to-amber-500 text-white shadow-[0_2px_12px_rgba(239,68,68,0.35)]' : 'text-stone-400 hover:text-stone-200');
+              (on ? 'accent-grad text-white shadow-[0_2px_12px_rgba(239,68,68,0.35)]' : 'text-stone-400 hover:text-stone-200');
             b.setAttribute('aria-pressed', on);
           });
           groups.single.hidden = mode !== 'single';
@@ -1416,6 +1426,7 @@
       themeIndex = (index + themes.length) % themes.length;
       const t = themes[themeIndex];
       document.querySelector('main').dataset.theme = t.id;
+      document.documentElement.dataset.theme = t.id;
       $('bgLabel').textContent = t.label;
       try { localStorage.setItem(THEME_KEY, t.id); } catch (_) {}
     }
@@ -1611,7 +1622,7 @@
         const bar = el('div', 'fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-4 py-3 rounded-2xl bg-[#1C1212]/95 border border-amber-400/40 backdrop-blur-xl text-amber-100 text-xs font-medium shadow-2xl flex items-center gap-3');
         bar.id = 'updateBanner';
         bar.setAttribute('role', 'status');
-        const btn = el('button', 'shrink-0 px-3 py-1.5 rounded-full bg-[#F7F2DC] text-[#14120E] font-bold', 'Refresh');
+        const btn = el('button', 'shrink-0 px-3 py-1.5 rounded-full btn-accent font-bold', 'Refresh');
         btn.type = 'button';
         btn.addEventListener('click', () => location.reload());
         bar.append(el('span', 'flex-1', 'A newer version of this page is available.'), btn);
