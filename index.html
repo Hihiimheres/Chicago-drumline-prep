@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.8">
+  <meta name="site-version" content="2026-11-16.9">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -203,7 +203,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.8">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.9">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -342,7 +342,7 @@
 
       <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
         <span>✦ Snare / Tenors / Bass / Cymbals</span>
-        <span class="flex items-center gap-3">
+        <span class="flex flex-wrap items-center gap-x-4 gap-y-1.5 [&>*]:whitespace-nowrap">
           <a href="https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00" target="_blank" rel="noopener" class="text-stone-300 hover:text-white hover:underline">Manage my plan</a>
           <button type="button" data-open-review class="text-stone-300 hover:text-white hover:underline">Leave a review</button>
           <button type="button" data-open-policy class="text-stone-300 hover:text-white hover:underline">Cancellation &amp; refunds</button>
@@ -367,7 +367,8 @@
             <nav class="flex items-center gap-1.5" aria-label="Booking steps">
               <button type="button" data-step-dot="1" class="w-5 h-1.5 rounded-full bg-red-500 transition-all" aria-label="Step 1: Format"></button>
               <button type="button" data-step-dot="2" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 2: Duration"></button>
-              <button type="button" data-step-dot="3" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 3: Date and contact"></button>
+              <button type="button" data-step-dot="3" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 3: When and where"></button>
+              <button type="button" data-step-dot="4" class="w-2 h-1.5 rounded-full bg-white/20 transition-all" aria-label="Step 4: Your details"></button>
             </nav>
           </div>
 
@@ -396,117 +397,116 @@
               <div id="rateButtonsContainer" class="space-y-2.5"></div>
             </div>
 
-            <!-- PAGE 3: Date & contact -->
-            <form id="page3" class="step-page space-y-3" hidden novalidate>
-              <button type="button" data-go="2" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-[11px] font-semibold text-stone-200 transition" aria-label="Back to lesson length">← Back</button>
-              <p id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug w-fit max-w-full">—</p>
+            <form id="bookingForm" novalidate>
+            <!-- PAGE 3: When & where -->
+            <div id="page3" class="step-page space-y-4" hidden>
+              <button type="button" data-go="2" class="inline-flex items-center gap-1 px-4 py-2 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-xs font-semibold text-stone-200 transition" aria-label="Back to lesson length">← Back</button>
+              <p id="choiceSummary" class="text-sm font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-3 py-1.5 leading-snug w-fit max-w-full">—</p>
 
               <div>
-                <label for="sessionDateInput" id="dateLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
-                <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                <p id="availHint" class="mt-1 text-[10px] text-stone-400">Book at least a day ahead · Weekends: any time · Weekdays: after 5:00 PM</p>
-              </div>
-
-              <div role="group" aria-labelledby="timeLabel">
-                <span id="timeLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Time of day</span>
-                <div id="timeChips" class="grid grid-cols-2 sm:grid-cols-4 gap-1.5"></div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label for="clientFirst" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">First name</label>
-                  <input type="text" id="clientFirst" autocomplete="given-name" autocapitalize="words" required placeholder="Alex" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                <label for="sessionDateInput" id="dateLabel" class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Preferred date &amp; time</label>
+                <div class="grid grid-cols-[1fr_9.5rem] sm:grid-cols-[1fr_11rem] gap-2">
+                  <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem]" />
+                  <select id="timeSelect" aria-label="Time of day" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem] cursor-pointer"></select>
                 </div>
-                <div>
-                  <label for="clientLast" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Last name</label>
-                  <input type="text" id="clientLast" autocomplete="family-name" autocapitalize="words" required placeholder="Rivera" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <div>
-                  <label for="clientEmail" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Email</label>
-                  <input type="email" id="clientEmail" autocomplete="email" inputmode="email" placeholder="student@email.com" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                </div>
-                <div>
-                  <label for="clientPhone" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Phone</label>
-                  <input type="tel" id="clientPhone" autocomplete="tel" inputmode="tel" placeholder="(312) 555-0100" aria-describedby="contactHint" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                </div>
-              </div>
-              <p id="contactHint" class="text-[10px] text-stone-400 -mt-1" aria-live="polite">Email or phone, whichever you prefer.</p>
-
-              <div class="space-y-2">
-                <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] text-stone-300">
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" id="isMinor" class="accent-red-500 w-3.5 h-3.5"> The student is under 18
-                  </label>
-                  <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" id="rememberMe" checked class="accent-red-500 w-3.5 h-3.5"> Remember my details
-                  </label>
-                </div>
-                <fieldset id="guardianBlock" class="space-y-2" hidden>
-                  <legend class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Parent or guardian</legend>
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div>
-                      <label for="guardianName" class="sr-only">Parent or guardian name</label>
-                      <input type="text" id="guardianName" autocomplete="off" autocapitalize="words" placeholder="Full name" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                    </div>
-                    <div>
-                      <label for="guardianPhone" class="sr-only">Parent or guardian phone</label>
-                      <input type="tel" id="guardianPhone" autocomplete="off" inputmode="tel" placeholder="Phone" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
-                    </div>
-                  </div>
-                  <p class="text-[10px] text-stone-400">I’ll confirm lesson details with a parent or guardian.</p>
-                </fieldset>
+                <p id="availHint" class="mt-1.5 text-xs text-stone-400">Book at least a day ahead · Weekends: any time · Weekdays: after 5 PM</p>
               </div>
 
               <fieldset id="addressBlock" class="space-y-2" hidden>
-                <legend class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Lesson address</legend>
+                <legend class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Lesson address</legend>
                 <div>
                   <label for="clientStreet" class="sr-only">Street address</label>
-                  <input type="text" id="clientStreet" autocomplete="address-line1" placeholder="Street address" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                  <input type="text" id="clientStreet" autocomplete="address-line1" placeholder="Street address" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
                 </div>
-                <div class="grid grid-cols-[1fr_7rem] gap-2">
+                <div class="grid grid-cols-[1fr_8rem] gap-2">
                   <div>
                     <label for="clientCity" class="sr-only">City</label>
-                    <input type="text" id="clientCity" autocomplete="address-level2" placeholder="City" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                    <input type="text" id="clientCity" autocomplete="address-level2" placeholder="City" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
                   </div>
                   <div>
                     <label for="clientZip" class="sr-only">ZIP code</label>
-                    <input type="text" id="clientZip" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="ZIP" class="w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
+                    <input type="text" id="clientZip" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="ZIP" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
                   </div>
                 </div>
-                <p class="text-[10px] text-stone-400">I travel up to 20 driving miles. Free within 10 miles, then $1 per mile.</p>
-                <div id="travelInfo" role="status" aria-live="polite" class="text-[11px] rounded-xl px-3 py-2 border border-white/10 bg-white/[0.03] text-stone-300" hidden></div>
+                <p class="text-xs text-stone-400">I travel up to 20 driving miles. Free within 10 miles, then $1 per mile.</p>
+                <div id="travelInfo" role="status" aria-live="polite" class="text-sm rounded-xl px-3 py-2 border border-white/10 bg-white/[0.03] text-stone-300" hidden></div>
               </fieldset>
 
-              <div id="payChoice" role="group" aria-labelledby="payLabel">
-                <span id="payLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Payment</span>
-                <div class="grid grid-cols-2 gap-1.5">
-                  <button type="button" data-pay="online">💳 Pay online now</button>
-                  <button type="button" data-pay="lesson">💵 Pay at the lesson</button>
+              <button type="button" id="nextBtn" disabled class="w-full py-4 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">Pick a date to continue</button>
+            </div>
+
+            <!-- PAGE 4: Your details -->
+            <div id="page4" class="step-page space-y-4" hidden>
+              <button type="button" data-go="3" class="inline-flex items-center gap-1 px-4 py-2 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-xs font-semibold text-stone-200 transition" aria-label="Back to date and time">← Back</button>
+              <p id="whenSummary" class="text-sm font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-3 py-1.5 leading-snug w-fit max-w-full">—</p>
+
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label for="clientFirst" class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">First name</label>
+                  <input type="text" id="clientFirst" autocomplete="given-name" autocapitalize="words" required placeholder="Alex" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
+                </div>
+                <div>
+                  <label for="clientLast" class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Last name</label>
+                  <input type="text" id="clientLast" autocomplete="family-name" autocapitalize="words" required placeholder="Rivera" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
                 </div>
               </div>
-              <p id="payNotice" class="text-[10px] text-amber-200/90" hidden>💳 Digital lessons are paid online. You’ll go to secure checkout right after you submit.</p>
+
+              <fieldset>
+                <legend class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Email or phone <span class="normal-case tracking-normal font-normal text-stone-500">(one is enough)</span></legend>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div>
+                    <label for="clientEmail" class="sr-only">Email</label>
+                    <input type="email" id="clientEmail" autocomplete="email" inputmode="email" placeholder="Email" aria-describedby="contactHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label for="clientPhone" class="sr-only">Phone</label>
+                    <input type="tel" id="clientPhone" autocomplete="tel" inputmode="tel" placeholder="Phone" aria-describedby="contactHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
+                  </div>
+                </div>
+                <p id="contactHint" class="mt-1.5 text-xs text-red-300" aria-live="polite" hidden></p>
+              </fieldset>
+
+              <div class="space-y-2">
+                <label class="flex items-center gap-2.5 text-sm text-stone-300 cursor-pointer w-fit">
+                  <input type="checkbox" id="isMinor" class="accent-red-500 w-4 h-4"> The student is under 18
+                </label>
+                <fieldset id="guardianBlock" class="space-y-2" hidden>
+                  <legend class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Parent or guardian</legend>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label for="guardianName" class="sr-only">Parent or guardian name</label>
+                      <input type="text" id="guardianName" autocomplete="off" autocapitalize="words" placeholder="Full name" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label for="guardianPhone" class="sr-only">Parent or guardian phone</label>
+                      <input type="tel" id="guardianPhone" autocomplete="off" inputmode="tel" placeholder="Phone" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
+                    </div>
+                  </div>
+                  <p class="text-xs text-stone-400">I’ll confirm lesson details with a parent or guardian.</p>
+                </fieldset>
+              </div>
 
               <div>
-                <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-[11px] text-red-300 hover:underline">+ Add a note (experience, goals, audition date)</button>
+                <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-sm text-red-300 hover:underline">+ Add a note (experience, goals, audition date)</button>
                 <label for="clientNotes" class="sr-only">Note for your coach</label>
-                <textarea id="clientNotes" rows="2" maxlength="500" hidden placeholder="e.g. 2 years on snare, auditioning for a college line in March" class="mt-1 w-full px-3 py-2 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none resize-none"></textarea>
+                <textarea id="clientNotes" rows="3" maxlength="500" hidden placeholder="e.g. 2 years on snare, auditioning for a college line in March" class="mt-2 w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none resize-none"></textarea>
               </div>
 
               <!-- Spam trap: hidden from people, bots tend to fill it in -->
               <input type="text" id="hpField" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
 
-              <p class="text-[10px] text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white">See policy</button></p>
-              <button type="submit" id="submitBtn" disabled class="w-full py-3 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-xs uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">
-                Pick a date &amp; add email or phone
-              </button>
-              <p id="submitError" class="hidden text-[11px] text-red-300 text-center" role="alert"></p>
+              <div class="space-y-2">
+                <button type="submit" id="submitBtn" data-pay="online" disabled class="w-full py-4 rounded-full bg-[#F7F2DC] hover:bg-amber-200 text-[#14120E] font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed disabled:hover:bg-[#F7F2DC] transition transform active:scale-[0.98]">Add your first and last name</button>
+                <button type="submit" id="submitLessonBtn" data-pay="lesson" class="w-full py-4 rounded-full border border-white/20 bg-white/[0.04] hover:border-amber-300/60 text-[#F7F2DC] font-bold text-sm uppercase tracking-wider transition transform active:scale-[0.98]" hidden>Request · pay at the lesson</button>
+              </div>
+              <p class="text-xs text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white">See policy</button></p>
+              <p class="text-[11px] text-stone-500 text-center">Your details are remembered on this device for next time. <button type="button" id="forgetBtn" class="underline hover:text-stone-300">Forget them</button></p>
+              <p id="submitError" class="hidden text-sm text-red-300 text-center" role="alert"></p>
+            </div>
             </form>
 
-            <!-- PAGE 4: Success -->
-            <div id="page4" class="step-page space-y-3.5" hidden>
+            <!-- PAGE 5: Sent -->
+            <div id="page5" class="step-page space-y-3.5" hidden>
               <div class="flex items-center justify-between gap-2">
                 <button type="button" id="editBookingBtn" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-white/15 bg-white/[0.04] hover:border-red-400/70 hover:bg-red-500/10 text-[11px] font-semibold text-stone-200 transition">← Back to edit</button>
                 <button type="button" id="bookAnotherBtn" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full border border-red-400/40 bg-red-500/10 hover:bg-red-500/20 hover:border-red-400/70 text-[11px] font-semibold text-red-200 transition">+ Book another</button>
@@ -751,15 +751,18 @@
 
     /* ---------------- Navigation ---------------- */
     const subtitles = {
-      1: 'Step 1 of 3 • Format',
-      2: 'Step 2 of 3 • Length',
-      3: 'Step 3 of 3 • Details',
-      4: 'Almost done',
+      1: 'Step 1 of 4 • Format',
+      2: 'Step 2 of 4 • Length',
+      3: 'Step 3 of 4 • When & where',
+      4: 'Step 4 of 4 • Your details',
+      5: 'Almost done',
     };
+    const LAST_STEP = 4, SENT_PAGE = 5;
 
     function canGoTo(page) {
       if (page >= 2 && !state.format) return false;
       if (page >= 3 && !state.rate) return false;
+      if (page >= 4) { readContact(); if (whenReason()) return false; }
       return true;
     }
 
@@ -768,7 +771,8 @@
       state.page = page;
       $('stepSubtitle').textContent = subtitles[page];
 
-      [1, 2, 3, 4].forEach((n) => {
+      if (page === 4) $('whenSummary').textContent = whenSummaryText();
+      [1, 2, 3, 4, 5].forEach((n) => {
         const p = $('page' + n);
         const active = n === page;
         p.hidden = !active; // hidden steps take no space and are skipped by keyboard and screen readers
@@ -781,17 +785,17 @@
 
       document.querySelectorAll('[data-step-dot]').forEach((dot) => {
         const d = Number(dot.dataset.stepDot);
-        const current = d === page || (page === 4 && d === 3);
+        const current = d === page || (page === SENT_PAGE && d === LAST_STEP);
         dot.className = 'h-1.5 rounded-full transition-all ' + (
           current ? 'w-5 bg-red-500' : d < page ? 'w-2 bg-red-500/50' : 'w-2 bg-white/20'
         );
-        dot.disabled = page === 4 || !canGoTo(d); // "Book another" starts a fresh booking
+        dot.disabled = page === SENT_PAGE || !canGoTo(d); // "Book another" starts a fresh booking
         dot.style.cursor = dot.disabled ? 'not-allowed' : 'pointer';
         if (current) dot.setAttribute('aria-current', 'step'); else dot.removeAttribute('aria-current');
       });
 
       if (focus) {
-        const first = $('page' + page).querySelector('input, button:not([data-go])');
+        const first = $('page' + page).querySelector('input, select, button:not([data-go])');
         if (first) setTimeout(() => first.focus({ preventScroll: true }), 50);
         // If the top of the booking box is now above the screen, bring it back into view
         const panel = $('bookingPanel');
@@ -896,7 +900,7 @@
       state.rate = rate;
       $('choiceSummary').textContent = `${formats[state.format].label} • ${rateLabel(rate)} • ${priceLabel(rate)}`;
       // Plans pick a first lesson date; the same weekday/time repeats each week
-      $('dateLabel').textContent = rate.plan ? 'First lesson date (repeats weekly)' : 'Preferred date';
+      $('dateLabel').textContent = rate.plan ? 'First lesson date & time (repeats weekly)' : 'Preferred date & time';
       document.querySelectorAll('.rate-btn').forEach((b) => {
         const on = b === btn;
         b.classList.toggle('border-red-400', on);
@@ -939,45 +943,19 @@
       return !iso || isWeekend(iso) ? WEEKEND_TIMES : WEEKDAY_TIMES;
     }
 
-    function renderTimeChips() {
-      const iso = $('sessionDateInput').value;
-      const times = timesForDate(iso);
-      if (!times.includes(state.time)) state.time = times[0];
-      const weekday = times === WEEKDAY_TIMES;
-      $('timeLabel').textContent = weekday ? 'Time (weekdays are after 5 PM)' : 'Time of day';
-      $('timeChips').className = weekday ? 'grid grid-cols-1 gap-1.5' : 'grid grid-cols-2 sm:grid-cols-4 gap-1.5';
-      $('timeChips').replaceChildren(...times.map((t) => {
-        const b = el('button', '', t);
-        b.type = 'button';
-        b.dataset.time = t;
-        b.addEventListener('click', () => { state.time = t; syncTimeChips(); });
-        return b;
-      }));
-      syncTimeChips();
-    }
+    const timeText = (t) => (t === 'Any' ? 'Any time' : t);
 
-    function syncTimeChips() {
-      document.querySelectorAll('[data-time]').forEach((b) => {
-        const on = b.dataset.time === state.time;
-        b.className = 'py-1.5 rounded-lg border text-[11px] font-semibold transition ' +
-          (on ? 'border-red-400 bg-red-500/20 text-white' : 'border-white/10 bg-white/[0.03] text-stone-400 hover:text-stone-200');
-        b.setAttribute('aria-pressed', on);
-      });
+    function renderTimeOptions() {
+      const times = timesForDate($('sessionDateInput').value);
+      if (!times.includes(state.time)) state.time = times[0];
+      $('timeSelect').replaceChildren(...times.map((t) => Object.assign(document.createElement('option'), { value: t, textContent: timeText(t) })));
+      $('timeSelect').value = state.time;
     }
 
     /* ---------------- Payment ---------------- */
     function syncPayChoice() {
-      const digital = state.format === 'digital';
-      if (digital) state.pay = 'online';
-      $('payChoice').hidden = digital;
+      if (state.format === 'digital') state.pay = 'online';
       $('addressBlock').hidden = state.format !== 'inperson';
-      $('payNotice').hidden = !digital;
-      document.querySelectorAll('[data-pay]').forEach((b) => {
-        const on = b.dataset.pay === state.pay;
-        b.className = 'py-1.5 rounded-lg border text-[11px] font-semibold transition ' +
-          (on ? 'border-red-400 bg-red-500/20 text-white' : 'border-white/10 bg-white/[0.03] text-stone-400 hover:text-stone-200');
-        b.setAttribute('aria-pressed', on);
-      });
     }
 
     function makeBookingId(iso) {
@@ -1044,12 +1022,8 @@
 
     function saveContact() {
       try {
-        if ($('rememberMe').checked) {
-          const { first, last, email, phone, street, city, zip } = state;
-          localStorage.setItem(STORAGE_KEY, JSON.stringify({ first, last, email, phone, street, city, zip }));
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-        }
+        const { first, last, email, phone, street, city, zip } = state;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ first, last, email, phone, street, city, zip }));
       } catch (_) {}
     }
 
@@ -1176,34 +1150,56 @@
     const addressOk = () => !needsAddress() || (state.street.length >= 4 && state.city && isValidZip(state.zip));
     const lessonAddress = () => `${state.street}, ${state.city} ${state.zip}`;
 
+    // Why step 3 (date, time, address) isn't finished yet, or null when it is
+    function whenReason() {
+      const dateOk = state.date && state.date >= earliestBookingISO();
+      if (!state.date) return 'Pick a date to continue';
+      if (!dateOk) return 'Pick a date from tomorrow on';
+      if (!addressOk()) return 'Add the lesson address';
+      if (needsAddress() && travel.status === 'checking') return 'Checking distance…';
+      if (needsAddress() && travel.status === 'far') return 'Outside my travel area';
+      if (needsAddress() && travel.status !== 'ok') return 'Add the lesson address';
+      return null;
+    }
+
+    function whenSummaryText() {
+      if (!state.rate) return '—';
+      const when = isPlan() ? `Weekly from ${formatDate(state.date)}` : formatDate(state.date);
+      return `${rateLabel(state.rate)} • ${when}, ${timeText(state.time)}`;
+    }
+
     function updateSubmitState() {
       readContact();
-      const btn = $('submitBtn');
-      const hint = $('contactHint');
-      const problem = contactProblem();
-      const dateOk = state.date && state.date >= earliestBookingISO();
-      const touched = state.email || state.phone;
+      // Step 3
+      const wr = whenReason();
+      $('nextBtn').disabled = Boolean(wr) || !state.rate;
+      $('nextBtn').textContent = wr || 'Continue →';
 
-      hint.textContent = touched && problem ? problem : 'Email or phone, whichever you prefer.';
-      hint.classList.toggle('text-red-300', Boolean(touched && problem));
-      hint.classList.toggle('text-stone-400', !(touched && problem));
+      // Step 4
+      const problem = contactProblem();
+      const touched = state.email || state.phone;
+      $('contactHint').hidden = !(touched && problem);
+      $('contactHint').textContent = touched && problem ? problem : '';
 
       const nameOk = state.first && state.last;
       const guardianOk = !state.minor || (state.guardianName.length >= 2 && isValidPhone(state.guardianPhone));
-      const travelOk = !needsAddress() || travel.status === 'ok';
-      const ready = state.format && state.rate && dateOk && nameOk && !problem && guardianOk && addressOk() && travelOk;
-      btn.disabled = !ready;
-      const fee = needsAddress() && travel.status === 'ok' ? travel.fee : 0;
-      btn.textContent = ready ? (isPlan() ? `Start weekly plan • ${priceLabel(state.rate)}` : `Request ${formatDate(state.date)} • $${state.rate.price}${fee ? ` + $${fee} travel` : ''}`)
-        : !state.date ? 'Pick a date to continue'
-        : !dateOk ? 'Pick a date from tomorrow on'
-        : !nameOk ? 'Add your first and last name'
+      const detailsReason = !nameOk ? 'Add your first and last name'
         : problem ? 'Add email or phone to continue'
         : !guardianOk ? 'Add a parent or guardian name and phone'
-        : !addressOk() ? 'Add the lesson address'
-        : travel.status === 'checking' ? 'Checking distance…'
-        : travel.status === 'far' ? 'Outside my travel area'
-        : 'Add the lesson address';
+        : null;
+      const ready = state.format && state.rate && !wr && !detailsReason;
+      const btn = $('submitBtn');
+      btn.disabled = !ready;
+      const fee = needsAddress() && travel.status === 'ok' ? travel.fee : 0;
+      const total = state.rate ? state.rate.price + fee : 0;
+      btn.textContent = !ready ? (wr || detailsReason || 'Continue')
+        : isPlan() ? `Start weekly plan • ${priceLabel(state.rate)}`
+        : `Request & pay online • $${total}`;
+      // In-person lessons can also be paid at the lesson
+      const lessonBtn = $('submitLessonBtn');
+      lessonBtn.hidden = !(ready && state.format === 'inperson');
+      lessonBtn.disabled = !ready;
+      lessonBtn.textContent = `Request · pay at the lesson ($${total})`;
     }
 
     function bookingSummary() {
@@ -1246,6 +1242,9 @@
 
     async function submitBooking(e) {
       e.preventDefault();
+      // Enter pressed on step 3 moves on instead of sending
+      if (state.page !== LAST_STEP) { if (state.page === 3 && canGoTo(4)) goToPage(4); return; }
+      state.pay = state.format === 'digital' ? 'online' : ((e.submitter && e.submitter.dataset.pay) || 'online');
       updateSubmitState();
       if ($('submitBtn').disabled) return;
 
@@ -1336,19 +1335,18 @@
       }
       state.lastBookingId = data.booking_id;
       state.correctionOf = '';
-      goToPage(4);
+      goToPage(SENT_PAGE);
     }
 
     function resetBooking() {
       const keepInst = state.instIndex;
       state = initialState();
       state.instIndex = keepInst;
-      $('page3').reset();
+      $('bookingForm').reset();
       $('sessionDateInput').min = earliestBookingISO();
-      $('rememberMe').checked = true;
       $('guardianBlock').hidden = true;
       loadSavedContact();
-      renderTimeChips();
+      renderTimeOptions();
       syncPayChoice();
       $('payBlock').hidden = true;
       setNoteOpen(false);
@@ -1532,13 +1530,19 @@
     renderFormats();
     initSlider();
     $('sessionDateInput').min = earliestBookingISO();
-    renderTimeChips();
+    renderTimeOptions();
     loadSavedContact();
     $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;
     $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
-    $('sessionDateInput').addEventListener('input', renderTimeChips);
-    document.querySelectorAll('[data-pay]').forEach((b) =>
-      b.addEventListener('click', () => { state.pay = b.dataset.pay; syncPayChoice(); }));
+    $('sessionDateInput').addEventListener('input', renderTimeOptions);
+    $('timeSelect').addEventListener('change', () => { state.time = $('timeSelect').value; });
+    $('nextBtn').addEventListener('click', () => goToPage(4));
+    $('forgetBtn').addEventListener('click', () => {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+      ['clientFirst', 'clientLast', 'clientEmail', 'clientPhone', 'clientStreet', 'clientCity', 'clientZip'].forEach((id) => { $(id).value = ''; });
+      $('forgetBtn').parentElement.textContent = 'Your saved details were cleared from this device.';
+      updateSubmitState();
+    });
     $('paidBannerClose').addEventListener('click', () => { $('paidBanner').hidden = true; });
     function openDialog(d) {
       if (typeof d.showModal === 'function') { d.showModal(); return; }
@@ -1578,12 +1582,12 @@
     });
     ['guardianName', 'guardianPhone'].forEach((id) => $(id).addEventListener('input', updateSubmitState));
 
-    $('page3').addEventListener('submit', submitBooking);
+    $('bookingForm').addEventListener('submit', submitBooking);
     $('bookAnotherBtn').addEventListener('click', resetBooking);
     $('editBookingBtn').addEventListener('click', () => {
       state.correctionOf = state.lastBookingId;
       updateSubmitState();
-      goToPage(3);
+      goToPage(4);
     });
     $('bgSwitchBtn').addEventListener('click', cycleTheme);
     $('exploreBtn').addEventListener('click', highlightServices);
