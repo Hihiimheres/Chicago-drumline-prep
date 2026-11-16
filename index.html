@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.18">
+  <meta name="site-version" content="2026-11-16.19">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -230,7 +230,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.18">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.19">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -1359,8 +1359,11 @@
       return fee ? `$${state.rate.price + fee} ($${state.rate.price} lesson + $${fee} travel)` : data.price;
     }
 
+    let sending = false; // blocks a second tap while a request is on its way
+
     async function submitBooking(e) {
       e.preventDefault();
+      if (sending) return;
       // Enter pressed on step 3 moves on instead of sending
       if (state.page !== LAST_STEP) { if (state.page === 3 && canGoTo(4)) goToPage(4); return; }
       state.pay = state.format === 'digital' ? 'online' : ((e.submitter && e.submitter.dataset.pay) || 'online');
@@ -1375,8 +1378,10 @@
 
       let message;
       if (CONFIG.formEndpoint) {
+        sending = true;
         btn.disabled = true;
-        btn.textContent = 'Sending…';
+        $('submitLessonBtn').disabled = true;
+        (state.pay === 'online' ? btn : $('submitLessonBtn')).textContent = 'Sending…';
         try {
           const res = await fetch(CONFIG.formEndpoint, {
             method: 'POST',
@@ -1400,6 +1405,8 @@
           err.classList.remove('hidden');
           updateSubmitState();
           return;
+        } finally {
+          sending = false;
         }
       } else {
         const details = [
@@ -1462,6 +1469,7 @@
       state = initialState();
       state.instIndex = keepInst;
       $('bookingForm').reset();
+      syncEmptyHints();
       $('flexibleTime').checked = false;
       $('sessionDateInput').min = earliestBookingISO();
       $('guardianBlock').hidden = true;
@@ -1658,7 +1666,6 @@
       document.querySelectorAll('[data-empty-hint]').forEach((h) => { h.hidden = Boolean($(h.dataset.emptyHint).value); });
     }
     ['sessionDateInput', 'timeInput'].forEach((id) => ['input', 'change'].forEach((ev) => $(id).addEventListener(ev, syncEmptyHints)));
-    setInterval(syncEmptyHints, 500); // also catches values the page fills in itself
     syncEmptyHints();
     document.querySelectorAll('[data-questions-link]').forEach((a) => { a.href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`; });
     $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
