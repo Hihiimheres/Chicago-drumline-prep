@@ -10,7 +10,8 @@
  *       Cancelled -> calendar event removed + student gets a cancellation email
  *       Contacted -> just a note to yourself (no email)
  *  3. If the student picked "flexible time", type the time you agree on in "Final time"
- *     (like 6:00 PM) before you set Confirmed.
+ *     (like 6:00 PM or 6pm) before you set Confirmed.
+ *  4. The day before each confirmed lesson the student gets a reminder email (weekly plans: every week).
  */
 
 const SETTINGS = {
@@ -23,11 +24,12 @@ const SETTINGS = {
   colourInPerson: 'GREEN',                  // calendar colours: GREEN, BLUE, RED, ORANGE, YELLOW, MAUVE, CYAN, GRAY,
   colourDigital: 'BLUE',                    //   PALE_GREEN, PALE_BLUE, PALE_RED
   siteUrl: 'https://hihiimheres.github.io/Chicago-drumline-prep/',
+  reminderHour: 17,                         // reminder emails go out around this hour (24h clock) the day before
 };
 
 /* Student emails. To change the wording without touching code, edit the "Emails" tab in the Sheet
    (columns: Email | Subject | Body); a row there replaces the matching default below.
-   Placeholders: {first} {lesson} {when} {where} {price} {booking} {instrument} {lessonRef} {site} */
+   Placeholders: {first} {lesson} {when} {time} {where} {price} {booking} {instrument} {lessonRef} {site} */
 const EMAILS = {
   confirm: {
     subject: 'Lesson confirmed: {when}',
@@ -36,6 +38,10 @@ const EMAILS = {
   decline: {
     subject: 'About your lesson request',
     body: "Hi {first},\n\nThanks for reaching out! Unfortunately I can't make {when} work. You're welcome to pick another time: {site}\n\nBoston Drumming Co.",
+  },
+  reminder: {
+    subject: 'Reminder: lesson tomorrow at {time}',
+    body: "Hi {first},\n\nSee you tomorrow!\n\n{lesson}\n{when}\n{where}\n\nNeed to change something? Just reply to this email.\n\nBoston Drumming Co.",
   },
   cancel: {
     subject: 'Lesson cancelled: {when}',
@@ -75,6 +81,7 @@ function setup() {
   sheet.setColumnWidth(COLUMNS.indexOf('Last action') + 1, 260);
   ScriptApp.getProjectTriggers().filter((t) => t.getHandlerFunction() === 'onStatusEdit').forEach((t) => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(ss).onEdit().create();
+  ensureReminderTrigger_();
   console.log('All set. Now deploy as a web app (Deploy > New deployment > Web app).');
 }
 
@@ -150,16 +157,29 @@ function onStatusEdit(e) {
   const col = head['Status'] + 1;
   if (e.range.getColumn() > col || e.range.getLastColumn() < col) return;
   const single = e.range.getNumRows() === 1 && e.range.getNumColumns() === 1;
-  for (let r = e.range.getRow(); r <= e.range.getLastRow(); r++) {
-    if (r < 2) continue;
-    const status = String(sheet.getRange(r, col).getValue());
-    act_(sheet, head, r, status, single ? String(e.oldValue || '') : '');
+  if (!single) {
+    // Pasting or filling many rows at once must not email a batch of students by accident
+    for (let r = Math.max(2, e.range.getRow()); r <= e.range.getLastRow(); r++) {
+      sheet.getRange(r, head['Last action'] + 1).setValue(stamp_() + ' · Nothing sent: change one row at a time to update the calendar and email the student');
+    }
+    return;
   }
+  if (e.range.getRow() < 2) return;
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000); // one change at a time, so a double tap can't book twice
+  try {
+    act_(sheet, head, e.range.getRow(), String(sheet.getRange(e.range.getRow(), col).getValue()), String(e.oldValue || ''));
+  } finally {
+    lock.releaseLock();
+  }
+  try { ensureReminderTrigger_(); } catch (_) { /* tried again next edit */ }
 }
+
+function stamp_() { return Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'MMM d, h:mm a'); }
 
 function act_(sheet, head, r, status, oldStatus) {
   const get = (c) => String(sheet.getRange(r, head[c] + 1).getValue());
-  const note = (t) => sheet.getRange(r, head['Last action'] + 1).setValue(Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'MMM d, h:mm a') + ' · ' + t);
+  const note = (t) => sheet.getRange(r, head['Last action'] + 1).setValue(stamp_() + ' · ' + t);
   if (status === oldStatus) return;
   const info = {
     name: get('Name'), instrument: get('Instrument'), format: get('Format'), lesson: get('Lesson'), price: get('Price'),
@@ -168,11 +188,14 @@ function act_(sheet, head, r, status, oldStatus) {
   };
   try {
     if (status === 'Confirmed') {
-      if (get('Event ID')) return note('Already on your calendar');
+      if (get('Event ID')) {
+        if (eventExists_(get('Event ID'))) return note('Already on your calendar');
+        sheet.getRange(r, head['Event ID'] + 1).setValue(''); // it was deleted from the calendar: book it again
+      }
       const when = whenFor_(get('Date'), get('Final time') || get('Time'));
       if (!when) {
         sheet.getRange(r, head['Status'] + 1).setValue('Contacted');
-        note('Type the agreed time in "Final time" (like 6:00 PM), then set Confirmed again');
+        note('Type the agreed time in "Final time" (like 6:00 PM or 6pm), then set Confirmed again');
         ss_().toast('Add a "Final time" first, then confirm again.', 'Need a time', 8);
         return;
       }
@@ -190,8 +213,9 @@ function act_(sheet, head, r, status, oldStatus) {
       if (info.email) { sendTemplate_('decline', info.email, vars_(info, whenFor_(info.date, get('Final time') || get('Time')))); note('Declined: email sent'); }
       else note('Declined: no email on file');
     } else if (status === 'Cancelled') {
-      removeEvent_(sheet, head, r);
-      if (info.email) { sendTemplate_('cancel', info.email, vars_(info, whenFor_(info.date, get('Final time') || get('Time')))); note('Cancelled: removed from calendar, email sent'); }
+      const wasBooked = removeEvent_(sheet, head, r) || oldStatus === 'Confirmed';
+      if (!wasBooked) note('Cancelled. No email sent because it was never confirmed (use Declined to tell the student)');
+      else if (info.email) { sendTemplate_('cancel', info.email, vars_(info, whenFor_(info.date, get('Final time') || get('Time')))); note('Cancelled: removed from calendar, email sent'); }
       else note('Cancelled: removed from calendar, no email on file');
     }
   } catch (err) {
@@ -237,16 +261,31 @@ function createEvent_(i, when, minutes) {
   return id;
 }
 
+// Removes the row's calendar event if it has one; returns true when there was one
 function removeEvent_(sheet, head, r) {
   const cell = sheet.getRange(r, head['Event ID'] + 1);
   const id = String(cell.getValue());
-  if (!id) return;
+  if (!id) return false;
   try {
     const cal = calendar_();
     if (id.indexOf('series:') === 0) cal.getEventSeriesById(id.slice(7)).deleteEventSeries();
     else cal.getEventById(id.slice(6)).deleteEvent();
   } catch (_) { /* already gone */ }
   cell.setValue('');
+  return true;
+}
+
+// Is the saved calendar event still there? (false if it was deleted from the calendar)
+function eventExists_(id) {
+  try {
+    const cal = calendar_();
+    const ev = id.indexOf('series:') === 0 ? cal.getEventSeriesById(id.slice(7)) : cal.getEventById(id.slice(6));
+    if (!ev) return false;
+    ev.getTitle(); // throws if the event can't be read
+    return true;
+  } catch (_) {
+    return false;
+  }
 }
 
 /* ---------------- Emails ---------------- */
@@ -272,6 +311,7 @@ function vars_(i, start) {
     instrument: i.instrument,
     lesson: i.instrument + ' · ' + minutes + ' min · ' + (digital ? 'video call' : 'in person'),
     when: when,
+    time: start ? Utilities.formatDate(start, tz, 'h:mm a') : '',
     where: digital ? "I'll send the call link before we start." : i.address,
     price: i.price + (fee ? ' + $' + fee + ' travel' : '') + ' · ' + how,
     booking: i.id,
@@ -331,14 +371,65 @@ function lessonMinutes_(lesson) {
   return m ? Number(m[1]) : 60;
 }
 
-// "2026-11-21" + "6:00 PM" (or "18:00") -> Date in the script's time zone, or null
+// "2026-11-21" + a time ("6:00 PM", "6pm", "6:30 pm", "18:30") -> Date in the script's time zone, or null
 function whenFor_(dateText, timeText) {
   const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(dateText).trim());
-  const t = /^(\d{1,2}):(\d{2})\s*([AaPp][Mm])?$/.exec(String(timeText).trim());
-  if (!d || !t) return null;
-  let h = Number(t[1]);
-  const m = Number(t[2]);
-  if (t[3]) { const pm = t[3].toLowerCase() === 'pm'; if (h < 1 || h > 12) return null; h = (h % 12) + (pm ? 12 : 0); }
+  if (!d) return null;
+  const t = String(timeText).trim().toLowerCase().replace(/\./g, '');
+  let h, m;
+  let x = /^(\d{1,2})(?::(\d{2}))?\s*(am|pm|a|p)$/.exec(t);
+  if (x) {
+    h = Number(x[1]); m = Number(x[2] || 0);
+    if (h < 1 || h > 12) return null;
+    h = (h % 12) + (x[3][0] === 'p' ? 12 : 0);
+  } else {
+    x = /^(\d{1,2}):(\d{2})$/.exec(t);
+    if (!x) return null;
+    h = Number(x[1]); m = Number(x[2]);
+  }
   if (h > 23 || m > 59) return null;
   return new Date(Number(d[1]), Number(d[2]) - 1, Number(d[3]), h, m);
+}
+
+/* ---------------- Reminder emails (runs once a day) ---------------- */
+function ensureReminderTrigger_() {
+  if (ScriptApp.getProjectTriggers().some((t) => t.getHandlerFunction() === 'sendReminders')) return;
+  ScriptApp.newTrigger('sendReminders').timeBased().everyDays(1).atHour(SETTINGS.reminderHour).create();
+}
+
+// Emails every student with a confirmed lesson tomorrow (weekly plans: tomorrow's weekly lesson)
+function sendReminders() {
+  const sheet = ss_().getSheetByName(SETTINGS.sheetName);
+  const head = headers_(sheet);
+  const last = sheet.getLastRow();
+  if (last < 2) return;
+  const tz = Session.getScriptTimeZone();
+  const tomorrow = new Date(Date.now() + 24 * 3600 * 1000);
+  const day = Utilities.formatDate(tomorrow, tz, 'yyyy-MM-dd');
+  const props = PropertiesService.getScriptProperties();
+  const rows = sheet.getRange(2, 1, last - 1, sheet.getLastColumn()).getValues();
+  rows.forEach((row, n) => {
+    const get = (c) => String(row[head[c]]);
+    if (get('Status') !== 'Confirmed' || !get('Email')) return;
+    const info = {
+      name: get('Name'), instrument: get('Instrument'), format: get('Format'), lesson: get('Lesson'), price: get('Price'),
+      address: get('Address'), payment: get('Payment'), plan: get('Plan'), id: get('Booking ID'), travel: get('Travel'), date: get('Date'),
+    };
+    const first = whenFor_(info.date, get('Final time') || get('Time'));
+    if (!first) return;
+    let start;
+    if (info.plan) {
+      // weekly: same weekday and time as the first lesson, from the first lesson on
+      if (info.date > day || Utilities.formatDate(first, tz, 'u') !== Utilities.formatDate(tomorrow, tz, 'u')) return;
+      start = whenFor_(day, Utilities.formatDate(first, tz, 'HH:mm'));
+    } else {
+      if (info.date !== day) return;
+      start = first;
+    }
+    const key = 'reminded:' + info.id + ':' + day;
+    if (props.getProperty(key)) return; // already sent today
+    sendTemplate_('reminder', get('Email'), vars_(Object.assign({}, info, { plan: '' }), start));
+    props.setProperty(key, '1');
+    sheet.getRange(n + 2, head['Last action'] + 1).setValue(stamp_() + ' · Reminder email sent for ' + day);
+  });
 }

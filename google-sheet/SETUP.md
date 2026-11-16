@@ -11,7 +11,11 @@ Every request from the site is saved as a row in a Google Sheet. You change a ro
 | **Cancelled** | The calendar event is removed and the student is told. |
 | **Replaced** | Set automatically when a student edits a request after sending it. |
 
-If a student chose **flexible time**, type the time you agreed on in the **Final time** column (like `6:00 PM`) before you pick Confirmed.
+The day before each **Confirmed** lesson (around 5 PM) the student gets a reminder email; weekly-plan students get one before every lesson. The daily reminder job installs itself the first time you change a Status.
+
+Change one row's Status at a time: changes to several rows at once (paste/fill) are ignored, so no batch of emails goes out by accident.
+
+If a student chose **flexible time**, type the time you agreed on in the **Final time** column (like `6:00 PM` or `6pm`) before you pick Confirmed.
 
 ## Steps (use a computer, signed in to the Google account whose calendar you want to use)
 
