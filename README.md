@@ -16,10 +16,12 @@ Live site: https://hihiimheres.github.io/Chicago-drumline-prep/ (GitHub Pages, s
 | `site.webmanifest` | Name and icons for "Add to Home Screen" |
 | `sitemap.xml` | Submit in Google Search Console to get indexed faster |
 | `version.txt` | Current site version, read by open pages to know when to refresh |
+| `google-sheet/` | Script + setup guide that saves bookings to a Google Sheet, adds confirmed lessons to Google Calendar and emails students |
 
 ## Settings (in `index.html`)
 
 - `CONFIG.formEndpoint`: Formspree form that receives bookings
+- `CONFIG.sheetEndpoint`: Google Sheet web address (see `google-sheet/SETUP.md`); empty = off
 - `CONFIG.paymentLinks`: one Stripe Payment Link per lesson
 - `TRAVEL`: in-person distance rules (start point, free miles, $ per mile, max miles)
 - `WEEKEND_TIMES` / `WEEKDAY_TIMES`: time-of-day choices
