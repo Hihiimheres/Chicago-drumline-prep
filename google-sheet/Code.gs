@@ -20,6 +20,8 @@ const SETTINGS = {
   replyTo: 'Boston.drumming@icloud.com',   // students' replies go here
   calendarName: '',                         // blank = your main Google Calendar
   reminderMinutes: 60,                      // pop-up reminder before each lesson
+  colourInPerson: 'GREEN',                  // calendar colours: GREEN, BLUE, RED, ORANGE, YELLOW, MAUVE, CYAN, GRAY,
+  colourDigital: 'BLUE',                    //   PALE_GREEN, PALE_BLUE, PALE_RED
   siteUrl: 'https://hihiimheres.github.io/Chicago-drumline-prep/',
 };
 
@@ -208,9 +210,10 @@ function calendar_() {
 
 function createEvent_(i, when, minutes) {
   const start = when, end = new Date(start.getTime() + minutes * 60000);
-  const title = 'Drum lesson: ' + i.name + ' (' + i.instrument + ', ' + minutes + ' min)' + (i.plan ? ' · weekly' : '');
+  // Name first so it shows even in the small calendar views, e.g. "Alex Rivera · Snare 60m"
+  const title = i.name + ' · ' + i.instrument + ' ' + minutes + 'm' + (i.plan ? ' · weekly' : '');
   const desc = [
-    'Booking ' + i.id, i.format + ' · ' + i.lesson + ' · ' + i.price + (i.payment ? ' · ' + i.payment : ''),
+    'Drum lesson · booking ' + i.id, i.format + ' · ' + i.lesson + ' · ' + i.price + (i.payment ? ' · ' + i.payment : ''),
     i.travel && 'Travel: ' + i.travel, i.phone && 'Phone: ' + i.phone, i.email && 'Email: ' + i.email,
     i.guardian && 'Parent/guardian: ' + i.guardian, i.plan && i.plan, i.notes && 'Note: ' + i.notes,
   ].filter(Boolean).join('\n');
@@ -226,6 +229,11 @@ function createEvent_(i, when, minutes) {
     id = 'event:' + ev.getId();
   }
   ev.addPopupReminder(SETTINGS.reminderMinutes);
+  // Colour by type: in person vs video call
+  try {
+    const colour = /digital/i.test(i.format) ? SETTINGS.colourDigital : SETTINGS.colourInPerson;
+    if (CalendarApp.EventColor[colour]) ev.setColor(CalendarApp.EventColor[colour]);
+  } catch (_) { /* colour is a nice-to-have */ }
   return id;
 }
 
