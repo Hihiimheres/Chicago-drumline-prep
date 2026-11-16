@@ -14,6 +14,7 @@
  */
 
 const SETTINGS = {
+  spreadsheetId: '',                        // blank when the script is pasted into the Sheet itself; the Sheet's ID when it's a standalone project
   sheetName: 'Requests',
   businessName: 'Boston Drumming Co.',
   replyTo: 'Boston.drumming@icloud.com',   // students' replies go here
@@ -34,9 +35,13 @@ const STATUS_COLOURS = {
   New: '#fde68a', Contacted: '#bfdbfe', Confirmed: '#bbf7d0', Declined: '#fecaca', Cancelled: '#e5e7eb', Replaced: '#e5e7eb',
 };
 
+function ss_() {
+  return SETTINGS.spreadsheetId ? SpreadsheetApp.openById(SETTINGS.spreadsheetId) : SpreadsheetApp.getActiveSpreadsheet();
+}
+
 /* ---------------- One-time setup (run from the editor) ---------------- */
 function setup() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = ss_();
   const sheet = ss.getSheetByName(SETTINGS.sheetName) || ss.insertSheet(SETTINGS.sheetName);
   sheet.getRange(1, 1, 1, COLUMNS.length).setValues([COLUMNS]).setFontWeight('bold').setBackground('#111827').setFontColor('#ffffff');
   sheet.setFrozenRows(1);
@@ -52,7 +57,7 @@ function setup() {
   sheet.setColumnWidth(COLUMNS.indexOf('Last action') + 1, 260);
   ScriptApp.getProjectTriggers().filter((t) => t.getHandlerFunction() === 'onStatusEdit').forEach((t) => ScriptApp.deleteTrigger(t));
   ScriptApp.newTrigger('onStatusEdit').forSpreadsheet(ss).onEdit().create();
-  SpreadsheetApp.getUi().alert('All set. Now deploy as a web app (see SETUP.md, step 4).');
+  console.log('All set. Now deploy as a web app (Deploy > New deployment > Web app).');
 }
 
 /* ---------------- Receives a request from the website ---------------- */
@@ -66,7 +71,7 @@ function doPost(e) {
     if (!/^BD-\d{4}-[A-Z0-9]{3,6}$/.test(id)) return reply_('bad id');
     if (!clean_(d.name, 100) || !(clean_(d.email, 120) || clean_(d.phone, 40))) return reply_('missing details');
 
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SETTINGS.sheetName);
+    const sheet = ss_().getSheetByName(SETTINGS.sheetName);
     const head = headers_(sheet);
     const last = sheet.getLastRow();
     if (last > 1) {
@@ -145,7 +150,7 @@ function act_(sheet, head, r, status, oldStatus) {
       if (!when) {
         sheet.getRange(r, head['Status'] + 1).setValue('Contacted');
         note('Type the agreed time in "Final time" (like 6:00 PM), then set Confirmed again');
-        SpreadsheetApp.getActive().toast('Add a "Final time" first, then confirm again.', 'Need a time', 8);
+        ss_().toast('Add a "Final time" first, then confirm again.', 'Need a time', 8);
         return;
       }
       const minutes = lessonMinutes_(get('Lesson'));

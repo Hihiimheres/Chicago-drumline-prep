@@ -24,6 +24,18 @@ If a student chose **flexible time**, type the time you agreed on in the **Final
 
 Test it: make a booking on the site. A row should appear within a few seconds. Set its Status to Confirmed and check your calendar and the student's inbox (use your own email for the test).
 
+## On an iPad or phone
+
+The Google Sheets app can't open Apps Script, so use Safari instead:
+
+1. Open the Sheet in Safari (docs.google.com/spreadsheets, signed in), tap **aA** in the address bar, and choose **Request Desktop Website**.
+2. Tap **Extensions > Apps Script**.
+3. In another tab, open https://github.com/Hihiimheres/Chicago-drumline-prep/blob/main/google-sheet/Code.gs and tap the **Copy raw file** button (the two-squares icon above the code).
+4. Back in Apps Script: tap in the code box, select all, paste, and tap **Save** (the disk icon).
+5. Then continue from step 3 above (time zone, run `setup`, deploy as a web app, copy the web address).
+
+You only need `setup` once. If the Sheet already has the Requests tab with headers, `setup` just re-applies the formatting and adds the Status trigger.
+
 ## Changing things later
 
 - Wording of the emails, the reminder time, your reply-to address: the `SETTINGS` block at the top of `Code.gs`.
