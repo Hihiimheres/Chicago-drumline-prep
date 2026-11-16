@@ -20,9 +20,25 @@ const SETTINGS = {
   replyTo: 'Boston.drumming@icloud.com',   // students' replies go here
   calendarName: '',                         // blank = your main Google Calendar
   reminderMinutes: 60,                      // pop-up reminder before each lesson
-  digitalNote: 'This is a digital lesson (Zoom / FaceTime). I will send the link or call details before we start.',
-  policyLine: 'Need to change something? Just reply to this email. Cancel at least 24 hours before your lesson for a full refund.',
-  declineLine: 'Thank you for reaching out. Unfortunately I am not able to fit this request in. You are welcome to book another date and time on the site.',
+  siteUrl: 'https://hihiimheres.github.io/Chicago-drumline-prep/',
+};
+
+/* Student emails. To change the wording without touching code, edit the "Emails" tab in the Sheet
+   (columns: Email | Subject | Body); a row there replaces the matching default below.
+   Placeholders: {first} {lesson} {when} {where} {price} {booking} {instrument} {lessonRef} {site} */
+const EMAILS = {
+  confirm: {
+    subject: 'Lesson confirmed: {when}',
+    body: "Hi {first},\n\nYou're booked!\n\n{lesson}\n{when}\n{where}\n{price}\n\nNeed to change or cancel? Just reply to this email. Cancel 24+ hours ahead for a full refund.\n\nBoston Drumming Co.\nBooking {booking}",
+  },
+  decline: {
+    subject: 'About your lesson request',
+    body: "Hi {first},\n\nThanks for reaching out! Unfortunately I can't make {when} work. You're welcome to pick another time: {site}\n\nBoston Drumming Co.",
+  },
+  cancel: {
+    subject: 'Lesson cancelled: {when}',
+    body: "Hi {first},\n\nYour {lessonRef} has been cancelled. Want to reschedule? Book anytime: {site}\n\nBoston Drumming Co.",
+  },
 };
 
 const COLUMNS = [
@@ -143,6 +159,11 @@ function act_(sheet, head, r, status, oldStatus) {
   const get = (c) => String(sheet.getRange(r, head[c] + 1).getValue());
   const note = (t) => sheet.getRange(r, head['Last action'] + 1).setValue(Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'MMM d, h:mm a') + ' · ' + t);
   if (status === oldStatus) return;
+  const info = {
+    name: get('Name'), instrument: get('Instrument'), format: get('Format'), lesson: get('Lesson'), price: get('Price'),
+    address: get('Address'), phone: get('Phone'), email: get('Email'), notes: get('Notes'), payment: get('Payment'),
+    plan: get('Plan'), id: get('Booking ID'), travel: get('Travel'), guardian: get('Guardian'), date: get('Date'),
+  };
   try {
     if (status === 'Confirmed') {
       if (get('Event ID')) return note('Already on your calendar');
@@ -153,29 +174,22 @@ function act_(sheet, head, r, status, oldStatus) {
         ss_().toast('Add a "Final time" first, then confirm again.', 'Need a time', 8);
         return;
       }
-      const minutes = lessonMinutes_(get('Lesson'));
-      const info = {
-        name: get('Name'), instrument: get('Instrument'), format: get('Format'), lesson: get('Lesson'), price: get('Price'),
-        address: get('Address'), phone: get('Phone'), email: get('Email'), notes: get('Notes'), payment: get('Payment'),
-        plan: get('Plan'), id: get('Booking ID'), travel: get('Travel'), guardian: get('Guardian'),
-      };
+      const minutes = lessonMinutes_(info.lesson);
       const ev = createEvent_(info, when, minutes);
       sheet.getRange(r, head['Event ID'] + 1).setValue(ev);
       if (info.email) {
-        send_(info.email, 'Your drum lesson is confirmed', confirmBody_(info, when, minutes));
+        sendTemplate_('confirm', info.email, vars_(info, when));
         note('Confirmed: on your calendar, email sent');
       } else {
         note('Confirmed: on your calendar. No email on file, so contact them by phone: ' + info.phone);
       }
     } else if (status === 'Declined') {
       removeEvent_(sheet, head, r);
-      const email = get('Email');
-      if (email) { send_(email, 'About your drum lesson request', 'Hi ' + first_(get('Name')) + ',\n\n' + SETTINGS.declineLine + '\n\n' + SETTINGS.businessName); note('Declined: email sent'); }
+      if (info.email) { sendTemplate_('decline', info.email, vars_(info, whenFor_(info.date, get('Final time') || get('Time')))); note('Declined: email sent'); }
       else note('Declined: no email on file');
     } else if (status === 'Cancelled') {
       removeEvent_(sheet, head, r);
-      const email = get('Email');
-      if (email) { send_(email, 'Your drum lesson was cancelled', 'Hi ' + first_(get('Name')) + ',\n\nYour lesson on ' + get('Date') + ' has been cancelled. If you would like to book another time, you can do that on the site.\n\n' + SETTINGS.businessName); note('Cancelled: removed from calendar, email sent'); }
+      if (info.email) { sendTemplate_('cancel', info.email, vars_(info, whenFor_(info.date, get('Final time') || get('Time')))); note('Cancelled: removed from calendar, email sent'); }
       else note('Cancelled: removed from calendar, no email on file');
     }
   } catch (err) {
@@ -228,21 +242,60 @@ function removeEvent_(sheet, head, r) {
 }
 
 /* ---------------- Emails ---------------- */
-function confirmBody_(i, start, minutes) {
+// Values for the email placeholders. `start` is the lesson Date, or null when no time is set yet.
+function vars_(i, start) {
   const tz = Session.getScriptTimeZone();
-  const day = Utilities.formatDate(start, tz, 'EEEE, MMMM d');
-  const time = Utilities.formatDate(start, tz, 'h:mm a');
-  return [
-    'Hi ' + first_(i.name) + ',', '',
-    'Your lesson is confirmed!', '',
-    'What: ' + i.instrument + ', ' + minutes + ' min (' + i.format + ')',
-    'When: ' + day + ' at ' + time + (i.plan ? ' (repeats every week at this time)' : ''),
-    'Where: ' + (i.address || SETTINGS.digitalNote),
-    'Price: ' + i.price + (i.payment ? ' · ' + i.payment : ''),
-    'Booking: ' + i.id, '',
-    SETTINGS.policyLine, '',
-    SETTINGS.businessName,
-  ].join('\n');
+  const minutes = lessonMinutes_(i.lesson);
+  const digital = /digital/i.test(i.format);
+  let when;
+  if (start) {
+    const time = Utilities.formatDate(start, tz, 'h:mm a');
+    when = i.plan
+      ? Utilities.formatDate(start, tz, 'EEEE') + 's at ' + time + ' (starting ' + Utilities.formatDate(start, tz, 'MMMM d') + ')'
+      : Utilities.formatDate(start, tz, 'EEEE, MMMM d') + ' at ' + time;
+  } else {
+    const day = whenFor_(i.date, '12:00');
+    when = day ? Utilities.formatDate(day, tz, 'EEEE, MMMM d') : i.date;
+  }
+  const fee = (/\$(\d+)/.exec(String(i.travel).split('·').pop()) || [])[1];
+  const how = /lesson/i.test(i.payment) ? 'pay at the lesson' : i.plan ? 'billed monthly' : 'online payment';
+  return {
+    first: first_(i.name),
+    instrument: i.instrument,
+    lesson: i.instrument + ' · ' + minutes + ' min · ' + (digital ? 'video call' : 'in person'),
+    when: when,
+    where: digital ? "I'll send the call link before we start." : i.address,
+    price: i.price + (fee ? ' + $' + fee + ' travel' : '') + ' · ' + how,
+    booking: i.id,
+    lessonRef: i.plan ? 'weekly ' + i.instrument + ' lessons (' + when + ')' : i.instrument + ' lesson on ' + when,
+    site: SETTINGS.siteUrl,
+  };
+}
+
+// The "Emails" tab's row for this email if there is one, else the default above
+function template_(key) {
+  const t = EMAILS[key];
+  try {
+    const tab = ss_().getSheetByName('Emails');
+    if (tab) {
+      const rows = tab.getDataRange().getValues();
+      for (let n = 0; n < rows.length; n++) {
+        if (String(rows[n][0]).trim().toLowerCase() === key && String(rows[n][2]).trim()) {
+          return { subject: String(rows[n][1]).trim() || t.subject, body: String(rows[n][2]) };
+        }
+      }
+    }
+  } catch (_) { /* fall back to the default */ }
+  return t;
+}
+
+function fill_(text, vars) {
+  return String(text).replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m));
+}
+
+function sendTemplate_(key, to, vars) {
+  const t = template_(key);
+  send_(to, fill_(t.subject, vars), fill_(t.body, vars));
 }
 
 function send_(to, subject, body) {
