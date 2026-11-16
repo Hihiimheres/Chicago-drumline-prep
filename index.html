@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.4">
+  <meta name="site-version" content="2026-11-16.5">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -89,7 +89,10 @@
           "@type": "Service",
           "name": "In-person drumline lesson, 90 min (Audition Block)"
         }
-      }
+      },
+      {"@type": "Offer", "price": "54", "priceCurrency": "USD", "itemOffered": {"@type": "Service", "name": "Weekly digital drumline lessons, 30 min (4 per month)"}},
+      {"@type": "Offer", "price": "90", "priceCurrency": "USD", "itemOffered": {"@type": "Service", "name": "Weekly digital drumline lessons, 60 min (4 per month)"}},
+      {"@type": "Offer", "price": "126", "priceCurrency": "USD", "itemOffered": {"@type": "Service", "name": "Weekly digital drumline lessons, 90 min (4 per month)"}}
     ]
   }
   </script>
@@ -200,7 +203,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.4">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.5">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -215,6 +218,7 @@
         <li class="flex gap-3"><span aria-hidden="true">✅</span><span><strong class="font-semibold text-white">Cancel at least 24 hours before your lesson</strong> and you’ll get a full refund.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">📅</span><span><strong class="font-semibold text-white">Weekly plans:</strong> billed monthly for 4 lessons. Cancel anytime from <a class="text-red-300 underline" href="https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00" target="_blank" rel="noopener">your plan page</a>; your plan runs to the end of the month you’ve paid for, and that month isn’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 20 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
@@ -261,7 +265,7 @@
   <!-- Shown when Stripe sends the student back with ?paid=1 -->
   <div id="paidBanner" role="status" hidden class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-md px-4 py-3 rounded-2xl bg-emerald-500/15 border border-emerald-400/40 backdrop-blur-xl text-emerald-100 text-xs font-medium shadow-2xl flex items-center gap-3">
     <span class="text-lg" aria-hidden="true">✅</span>
-    <span class="flex-1">Payment received. Thank you! Stripe has emailed your receipt, and I’ll be in touch to confirm your lesson.</span>
+    <span id="paidBannerText" class="flex-1">Payment received. Thank you! Stripe has emailed your receipt, and I’ll be in touch to confirm your lesson.</span>
     <button type="button" id="paidBannerClose" class="text-emerald-200 hover:text-white text-base leading-none" aria-label="Dismiss">×</button>
   </div>
 
@@ -339,6 +343,7 @@
       <div class="pt-3 border-t border-red-500/15 flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
         <span>✦ Snare / Tenors / Bass / Cymbals</span>
         <span class="flex items-center gap-3">
+          <a href="https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00" target="_blank" rel="noopener" class="text-stone-300 hover:text-white hover:underline">Manage my plan</a>
           <button type="button" data-open-review class="text-stone-300 hover:text-white hover:underline">Leave a review</button>
           <button type="button" data-open-policy class="text-stone-300 hover:text-white hover:underline">Cancellation &amp; refunds</button>
           <a id="questionsLink" href="mailto:Boston.drumming@icloud.com" class="text-red-400/90 font-medium hover:text-red-300 hover:underline">Questions? Email me →</a>
@@ -397,7 +402,7 @@
               <p id="choiceSummary" class="text-[11px] font-semibold text-red-200 bg-red-500/10 border border-red-500/25 rounded-xl px-2.5 py-1 leading-snug w-fit max-w-full">—</p>
 
               <div>
-                <label for="sessionDateInput" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
+                <label for="sessionDateInput" id="dateLabel" class="text-[10px] uppercase tracking-wider text-stone-400 font-semibold block mb-1">Preferred date</label>
                 <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-3.5 py-2.5 rounded-xl bg-black/50 border border-white/15 text-base sm:text-xs text-[#FDFBF7] focus:border-red-400 focus:outline-none" />
                 <p id="availHint" class="mt-1 text-[10px] text-stone-400">Book at least a day ahead · Weekends: any time · Weekdays: after 5:00 PM</p>
               </div>
@@ -568,7 +573,12 @@
     const CONFIG = {
       formEndpoint: 'https://formspree.io/f/xnpdpvan',
       contactEmail: 'Boston.drumming@icloud.com',
+      // Stripe customer portal: subscribers log in with their email to cancel or update their card
+      planPortal: 'https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00',
       paymentLinks: {
+        'digital-30-plan': 'https://buy.stripe.com/9B6aEXc9icxT5QIeZgasg0q',   // Weekly 30 min — $54/month
+        'digital-60-plan': 'https://buy.stripe.com/cNi5kDa1acxTfri04masg0r',   // Weekly 60 min — $90/month
+        'digital-90-plan': 'https://buy.stripe.com/7sY8wPc9ibtPbb22cuasg0s',   // Weekly 90 min — $126/month
         'digital-30':  'https://buy.stripe.com/3cI9AT0qAfK5djaaJ0asg02',   // Digital 30 min  — $15
         'digital-60':  'https://buy.stripe.com/8x2bJ1c9igO93IAeZgasg03',   // Digital 60 min  — $25
         'digital-90':  'https://buy.stripe.com/6oU4gza1adBX92U04masg04',   // Digital 90 min  — $35
@@ -642,6 +652,10 @@
           { id: 'digital-30', minutes: 30, price: 15 },
           { id: 'digital-60', minutes: 60, price: 25 },
           { id: 'digital-90', minutes: 90, price: 35 },
+          // Monthly plans: 4 lessons a month (one a week), about 10% off, billed monthly, cancel anytime
+          { id: 'digital-30-plan', minutes: 30, price: 54, plan: true, single: 15 },
+          { id: 'digital-60-plan', minutes: 60, price: 90, plan: true, single: 25 },
+          { id: 'digital-90-plan', minutes: 90, price: 126, plan: true, single: 35 },
         ],
       },
       inperson: {
@@ -722,7 +736,9 @@
       return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`;
     }
 
-    const rateLabel = (r) => `${r.minutes} min${r.tag ? ` (${r.tag})` : ''}`;
+    const rateLabel = (r) => r.plan ? `Weekly ${r.minutes} min plan` : `${r.minutes} min${r.tag ? ` (${r.tag})` : ''}`;
+    const priceLabel = (r) => r.plan ? `$${r.price}/mo` : `$${r.price}`;
+    const isPlan = () => Boolean(state.rate && state.rate.plan);
 
     function el(tag, className, text) {
       const node = document.createElement(tag);
@@ -821,14 +837,25 @@
       syncPayChoice();
       const container = $('rateButtonsContainer');
       container.replaceChildren();
+      let planHeading = false;
       f.rates.forEach((r) => {
-        const btn = el('button', 'rate-btn w-full px-5 py-5 sm:py-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-red-400 transition flex items-center justify-between gap-3');
+        if (r.plan && !planHeading) {
+          planHeading = true;
+          const h = el('div', 'pt-3');
+          h.append(
+            el('p', 'text-xs text-stone-300 font-medium', 'Weekly plans · save 10%'),
+            el('p', 'text-[11px] text-stone-400', '4 lessons a month, one a week. Billed monthly, cancel anytime.'),
+          );
+          container.append(h);
+        }
+        const btn = el('button', 'rate-btn w-full px-5 py-5 sm:py-4 rounded-2xl border transition flex items-center justify-between gap-3 ' +
+          (r.plan ? 'border-amber-400/30 bg-amber-400/[0.06] hover:border-amber-300' : 'border-white/10 bg-white/[0.03] hover:border-red-400'));
         btn.type = 'button';
         btn.setAttribute('aria-pressed', 'false');
-        btn.append(
-          el('span', 'text-base sm:text-sm font-bold text-white text-left', rateLabel(r)),
-          el('span', 'shrink-0 text-xl sm:text-base font-extrabold text-red-300', `$${r.price} →`),
-        );
+        const label = el('span', 'text-left');
+        label.append(el('span', 'block text-base sm:text-sm font-bold text-white', r.plan ? `Weekly · ${r.minutes} min` : rateLabel(r)));
+        if (r.plan) label.append(el('span', 'block text-[11px] text-amber-200/80', `4 lessons for $${r.price} (instead of $${r.single * 4})`));
+        btn.append(label, el('span', 'shrink-0 text-xl sm:text-base font-extrabold ' + (r.plan ? 'text-amber-200' : 'text-red-300'), `${priceLabel(r)} →`));
         btn.addEventListener('click', () => chooseRate(r, btn));
         container.append(btn);
       });
@@ -841,7 +868,9 @@
     function chooseRate(rate, btn) {
       setTimeout(() => { readContact(); scheduleTravelCheck(); }, 150);
       state.rate = rate;
-      $('choiceSummary').textContent = `${formats[state.format].label} • ${rateLabel(rate)} • $${rate.price}`;
+      $('choiceSummary').textContent = `${formats[state.format].label} • ${rateLabel(rate)} • ${priceLabel(rate)}`;
+      // Plans pick a first lesson date; the same weekday/time repeats each week
+      $('dateLabel').textContent = rate.plan ? 'First lesson date (repeats weekly)' : 'Preferred date';
       document.querySelectorAll('.rate-btn').forEach((b) => {
         const on = b === btn;
         b.classList.toggle('border-red-400', on);
@@ -867,6 +896,11 @@
       state.minor = $('isMinor').checked;
       state.guardianName = $('guardianName').value.trim();
       state.guardianPhone = $('guardianPhone').value.trim();
+    }
+
+    function weekdayName(iso) {
+      const [y, m, d] = iso.split('-').map(Number);
+      return new Date(y, m - 1, d).toLocaleDateString('en-US', { weekday: 'long' });
     }
 
     function isWeekend(iso) {
@@ -947,6 +981,12 @@
     function showPaidBannerIfReturning() {
       const params = new URLSearchParams(location.search);
       if (!params.has('paid')) return;
+      if (params.has('plan')) {
+        $('paidBannerText').replaceChildren(
+          'You’re subscribed! Your weekly lessons are set. Stripe has emailed your receipt. ',
+          Object.assign(el('a', 'underline font-semibold', 'Manage or cancel your plan'), { href: CONFIG.planPortal, target: '_blank', rel: 'noopener' }),
+        );
+      }
       $('paidBanner').hidden = false;
       history.replaceState(null, '', location.pathname); // tidy the address bar
     }
@@ -1128,7 +1168,7 @@
       const ready = state.format && state.rate && dateOk && nameOk && !problem && guardianOk && addressOk() && travelOk;
       btn.disabled = !ready;
       const fee = needsAddress() && travel.status === 'ok' ? travel.fee : 0;
-      btn.textContent = ready ? `Request ${formatDate(state.date)} • $${state.rate.price}${fee ? ` + $${fee} travel` : ''}`
+      btn.textContent = ready ? (isPlan() ? `Start weekly plan • ${priceLabel(state.rate)}` : `Request ${formatDate(state.date)} • $${state.rate.price}${fee ? ` + $${fee} travel` : ''}`)
         : !state.date ? 'Pick a date to continue'
         : !dateOk ? 'Pick a date from tomorrow on'
         : !nameOk ? 'Add your first and last name'
@@ -1148,7 +1188,9 @@
         replaces_booking: state.correctionOf ? `#${state.correctionOf}` : '',
         payment: state.pay === 'online' ? 'Online (Stripe)' : 'At the lesson',
         length: rateLabel(state.rate),
-        price: `$${state.rate.price}`,
+        price: priceLabel(state.rate),
+        plan: isPlan() ? `Weekly plan: 4 × ${state.rate.minutes} min a month, $${state.rate.price}/month, cancel anytime` : '',
+        weekly_slot: isPlan() ? `${weekdayName(state.date)}s, ${state.time === 'Any' ? 'any time' : state.time}, starting ${formatDate(state.date)}` : '',
         instrument: instruments[state.instIndex],
         date: state.date,
         time: state.time === 'Any' ? 'Any time' : state.time,
@@ -1199,12 +1241,14 @@
             body: JSON.stringify({
               ...Object.fromEntries(Object.entries(data).filter(([, v]) => v)),
               ...($('hpField').value ? { _gotcha: $('hpField').value } : {}),
-              _subject: `${state.correctionOf ? `Correction to ${state.correctionOf} → ` : 'Lesson request '}${data.booking_id}: ${data.instrument}, ${formatDate(data.date)} (${data.payment})`,
+              _subject: `${state.correctionOf ? `Correction to ${state.correctionOf} → ` : isPlan() ? 'NEW WEEKLY PLAN ' : 'Lesson request '}${data.booking_id}: ${data.instrument}, ${formatDate(data.date)} (${data.payment})`,
             }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           message = state.pay === 'online'
-            ? '🎉 Request sent! Complete your payment below to lock in your lesson.'
+            ? (isPlan()
+              ? `🎉 Request sent! Start your plan below. You’ll be billed $${state.rate.price} each month until you cancel, and can cancel anytime.`
+              : '🎉 Request sent! Complete your payment below to lock in your lesson.')
             : `🎉 Request received! Bring ${feeTotal(data)} to your lesson. I’ll reach out to confirm the details.`;
           if (state.pay === 'online' && travel.fee && needsAddress() && !onlineTravelFee()) message += ` The $${travel.fee} travel fee is paid at the lesson.`;
         } catch (_) {
@@ -1220,6 +1264,8 @@
           `Format: ${data.format}`,
           `Payment: ${data.payment}`,
           `Length: ${data.length} — ${data.price}`,
+          data.plan && `Plan: ${data.plan}`,
+          data.weekly_slot && `Weekly slot: ${data.weekly_slot}`,
           `Instrument focus: ${data.instrument}`,
           `Preferred date: ${formatDate(data.date)} (${data.date}), ${data.time}`,
           data.name  && `Name: ${data.name}`,
@@ -1242,7 +1288,7 @@
       $('outFormat').textContent  = data.format;
       $('outRate').textContent    = `${data.length} • ${data.price}` + (needsAddress() && travel.fee ? ` + $${travel.fee} travel` : '');
       $('outFocus').textContent   = data.instrument;
-      $('outDate').textContent    = `${formatDate(data.date)} • ${data.time}`;
+      $('outDate').textContent    = isPlan() ? `Weekly from ${formatDate(data.date)} • ${data.time}` : `${formatDate(data.date)} • ${data.time}`;
       $('outContact').textContent = [data.name, data.email, data.phone].filter(Boolean).join(' • ');
       $('outAddressRow').hidden = !data.address;
       $('outAddress').textContent = data.address + (data.travel_miles ? ` (${data.travel_miles})` : '');
@@ -1254,7 +1300,7 @@
       if (payUrl) {
         $('payBtn').href = payUrl;
         const fee = onlineTravelFee();
-        $('payBtn').textContent = `Pay $${state.rate.price + fee} securely →`;
+        $('payBtn').textContent = isPlan() ? `Start plan · $${state.rate.price}/month →` : `Pay $${state.rate.price + fee} securely →`;
       } else if (state.pay === 'online' && CONFIG.formEndpoint) {
         $('successMsg').textContent = '🎉 Request received! I’ll send you a secure payment link with your confirmation.';
       }
