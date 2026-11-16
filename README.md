@@ -11,6 +11,11 @@ Live site: https://hihiimheres.github.io/Chicago-drumline-prep/ (GitHub Pages, s
 | `src/tailwind.css`, `tailwind.config.js`, `package.json` | Tailwind build setup |
 | `brand/` | Logo files, social media images and videos |
 | `og-image.png` | Link-preview image |
+| `assets/fonts/` | The site's fonts, served from this site (SIL Open Font License, licenses included) |
+| `404.html` | "Page not found" page GitHub Pages shows for missing addresses |
+| `site.webmanifest` | Name and icons for "Add to Home Screen" |
+| `sitemap.xml` | Submit in Google Search Console to get indexed faster |
+| `version.txt` | Current site version, read by open pages to know when to refresh |
 
 ## Settings (in `index.html`)
 
@@ -33,5 +38,5 @@ Commit `assets/site.css` together with `index.html`.
 ## Publishing an update
 
 Change the `site-version` meta tag (and the matching `?v=` on the stylesheet link) in `index.html`
-on every update. Pages that visitors already have open compare it with the published copy and
+on every update, and put the same value in `version.txt`. Pages that visitors already have open compare it with the published copy and
 refresh themselves (or show a Refresh button if someone is mid-booking).

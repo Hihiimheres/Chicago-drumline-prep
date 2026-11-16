@@ -1,0 +1,15 @@
+{
+  "name": "Boston Drumming Co.",
+  "short_name": "Boston Drumming",
+  "description": "Drumline lessons in Chicagoland and online. Learn. Practice. Play.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#0C0808",
+  "theme_color": "#100B0B",
+  "icons": [
+    { "src": "brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "brand/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "brand/logo-mark.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
