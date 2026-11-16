@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.12">
+  <meta name="site-version" content="2026-11-16.13">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -188,20 +188,6 @@
 
     [hidden] { display: none !important; }
 
-    /* Apple-style time wheel: snap-scrolling columns with a highlighted middle row */
-    .wheel { --row: 44px; position: relative; height: calc(var(--row) * 5); display: grid; grid-template-columns: 1fr 1fr 1fr;
-             border-radius: 18px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.10); overflow: hidden;
-             -webkit-mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent); mask-image: linear-gradient(transparent, #000 30%, #000 70%, transparent);
-             user-select: none; -webkit-user-select: none; transition: opacity .2s; }
-    .wheel.is-off { opacity: .35; pointer-events: none; }
-    .wheel-band { position: absolute; left: 8px; right: 8px; top: calc(var(--row) * 2); height: var(--row); border-radius: 12px; background: rgba(255,255,255,.10); pointer-events: none; }
-    .wheel-col { position: relative; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain;
-                 padding: calc(var(--row) * 2) 0; -webkit-overflow-scrolling: touch; }
-    .wheel-col::-webkit-scrollbar { display: none; }
-    .wheel-fixed { overflow: hidden; pointer-events: none; }
-    .wheel-item { height: var(--row); display: flex; align-items: center; justify-content: center; scroll-snap-align: center;
-                  font-size: 26px; font-variant-numeric: tabular-nums; color: rgba(245,239,230,.38); cursor: pointer; transition: color .15s, transform .15s; }
-    .wheel-item.is-on { color: #FDFBF7; transform: scale(1.06); font-weight: 600; }
 
     /* Full-screen on phones and tablets: pad for the notch and home-bar area (0 on computers) */
     main { padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); }
@@ -228,7 +214,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.12">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.13">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -430,21 +416,16 @@
 
               <div>
                 <label for="sessionDateInput" id="dateLabel" class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Preferred date &amp; time</label>
-                <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem]" />
-                <!-- Time: an Apple-style wheel for touch and mouse; the real (screen-reader / keyboard) control is the select -->
-                <label for="timeSelect" class="sr-only">Lesson start time</label>
-                <select id="timeSelect" class="sr-only"></select>
-                <div id="timeBlock" class="mt-2" hidden>
-                  <div id="timeWheel" class="wheel" aria-hidden="true">
-                    <div class="wheel-band"></div>
-                    <div class="wheel-col" data-col="hour"></div>
-                    <div class="wheel-col" data-col="min"></div>
-                    <div class="wheel-col wheel-fixed" data-col="ampm"></div>
-                  </div>
-                  <label class="mt-2 flex items-center gap-2.5 text-sm text-stone-300 cursor-pointer w-fit">
-                    <input type="checkbox" id="flexibleTime" class="accent-red-500 w-4 h-4"> I’m flexible on time
-                  </label>
+                <div class="grid grid-cols-[1fr_9.5rem] sm:grid-cols-[1fr_11rem] gap-2">
+                  <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem]" />
+                  <!-- Apple's own time wheel on iPhone/iPad; the site checks the time is within lesson hours -->
+                  <label for="timeInput" class="sr-only">Lesson start time</label>
+                  <input type="time" id="timeInput" step="1800" disabled aria-describedby="timeError availHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem] disabled:opacity-50" />
                 </div>
+                <p id="timeError" class="mt-1.5 text-sm text-red-300" role="alert" hidden></p>
+                <label class="mt-2 flex items-center gap-2.5 text-sm text-stone-300 cursor-pointer w-fit">
+                  <input type="checkbox" id="flexibleTime" class="accent-red-500 w-4 h-4"> I’m flexible on time
+                </label>
                 <p id="availHint" class="mt-1.5 text-xs text-stone-400">Book at least a day ahead · Weekdays 5–9 PM · Weekends 9 AM–8 PM</p>
               </div>
 
@@ -966,6 +947,8 @@
       state.email = $('clientEmail').value.trim();
       state.phone = $('clientPhone').value.trim();
       state.notes = $('clientNotes').value.trim();
+      const tv = $('timeInput').value;
+      state.time = $('flexibleTime').checked ? FLEXIBLE : (tv ? clockText(toMin(tv)) : '');
       state.minor = $('isMinor').checked;
       state.guardianName = $('guardianName').value.trim();
       state.guardianPhone = $('guardianPhone').value.trim();
@@ -991,134 +974,36 @@
 
     const timeText = (t) => (t === FLEXIBLE ? 'flexible time' : t);
 
-    // Start times (in minutes after midnight) for the chosen date
-    function slotsForDate(iso) {
-      if (!iso) return [];
+    const hhmm = (min) => `${String(Math.floor(min / 60)).padStart(2, '0')}:${String(min % 60).padStart(2, '0')}`;
+
+    // Earliest and latest start time (minutes after midnight) for a date, leaving room for the lesson
+    function timeWindow(iso) {
       const h = isWeekend(iso) ? HOURS.weekend : HOURS.weekday;
       const length = state.rate ? state.rate.minutes : 30;
-      const out = [];
-      for (let t = toMin(h.start); t + length <= toMin(h.end); t += HOURS.step) out.push(t);
-      return out;
-    }
-    const labelToMin = (label) => { const m = label.match(/(\d+):(\d+) (AM|PM)/); return m ? ((+m[1] % 12) + (m[3] === 'PM' ? 12 : 0)) * 60 + +m[2] : null; };
-
-    /* ----- Time wheel (hour · minutes · AM/PM) -----
-       Only times that fit the day's hours and the lesson length are offered.
-       The wheel ignores scrolling it does itself (`lockUntil`) and only commits
-       after the student's scroll settles, or straight away on a tap. */
-    const wheel = { slots: [], hours: [], cols: {}, minKey: '', lockUntil: 0, timer: 0, check: 0 };
-
-    function wheelItems(col, labels) {
-      wheel.cols[col].replaceChildren(...labels.map((text, i) => {
-        const d = document.createElement('div');
-        d.className = 'wheel-item'; d.textContent = text;
-        if (col !== 'ampm') d.addEventListener('click', () => commitWheel({ [col]: i }, true));
-        return d;
-      }));
-    }
-    const rowH = () => (wheel.cols.hour.firstElementChild ? wheel.cols.hour.firstElementChild.offsetHeight : 44);
-    function highlight(col, i) { [...wheel.cols[col].children].forEach((c, j) => c.classList.toggle('is-on', j === i)); }
-    function scrollWheelTo(col, i, smooth) {
-      wheel.lockUntil = Date.now() + (smooth ? 500 : 200);
-      wheel.cols[col].scrollTo({ top: i * rowH(), behavior: smooth ? 'smooth' : 'auto' });
-      highlight(col, i);
-    }
-    const wheelIndex = (col) => Math.max(0, Math.min(wheel.cols[col].children.length - 1, Math.round(wheel.cols[col].scrollTop / rowH())));
-    const minutesForHour = (h) => wheel.slots.filter((t) => Math.floor(t / 60) === h).map((t) => t % 60);
-    // Rebuild the minutes column only when the hour offers different minutes
-    function setMinutes(mins) {
-      const key = mins.join(',');
-      if (key === wheel.minKey) return false;
-      wheel.minKey = key;
-      wheelItems('min', mins.map((m) => String(m).padStart(2, '0')));
-      return true;
+      return { first: toMin(h.start), last: toMin(h.end) - length };
     }
 
-    // Put a slot (minutes after midnight) on the wheel without committing
-    function showSlot(t, smooth) {
-      const h = Math.floor(t / 60);
-      const mins = minutesForHour(h);
-      setMinutes(mins);
-      scrollWheelTo('hour', Math.max(0, wheel.hours.indexOf(h)), smooth);
-      scrollWheelTo('min', Math.max(0, mins.indexOf(t % 60)), smooth);
-      scrollWheelTo('ampm', h < 12 ? 0 : 1, smooth);
-      // Scroll snapping can nudge a column after we move it; make sure it landed on the right row
-      const want = { hour: Math.max(0, wheel.hours.indexOf(h)), min: Math.max(0, mins.indexOf(t % 60)) };
-      clearTimeout(wheel.check);
-      wheel.check = setTimeout(() => {
-        ['hour', 'min'].forEach((c) => { if (wheelIndex(c) !== want[c]) scrollWheelTo(c, want[c], false); else highlight(c, want[c]); });
-      }, smooth ? 600 : 80);
-    }
-
-    // Store the time the wheel points at (or an explicit tap), snapped to a valid slot
-    function commitWheel(pick = {}, smooth = false) {
-      clearTimeout(wheel.timer); // a tap wins over a scroll that is still settling
-      if (!wheel.slots.length || $('flexibleTime').checked) return;
-      const hi = pick.hour ?? wheelIndex('hour');
-      const h = wheel.hours[hi];
-      const mins = minutesForHour(h);
-      const prevMin = labelToMin(state.time);
-      const rebuilt = setMinutes(mins);
-      let mi = pick.min ?? (rebuilt ? mins.indexOf(prevMin % 60) : wheelIndex('min'));
-      if (mi < 0 || mi >= mins.length) mi = 0;
-      const t = h * 60 + mins[mi];
-      showSlot(t, smooth);
-      state.time = clockText(t);
-      $('timeSelect').value = state.time;
-      updateSubmitState();
-    }
-
-    function initWheel() {
-      ['hour', 'min', 'ampm'].forEach((c) => { wheel.cols[c] = document.querySelector(`#timeWheel [data-col="${c}"]`); });
-      wheelItems('ampm', ['AM', 'PM']);
-      ['hour', 'min'].forEach((c) => {
-        wheel.cols[c].addEventListener('scroll', () => {
-          if (Date.now() < wheel.lockUntil) return; // our own scrolling
-          const i = wheelIndex(c);
-          highlight(c, i);
-          if (c === 'hour' && wheel.hours[i] !== undefined) highlight('ampm', wheel.hours[i] < 12 ? 0 : 1);
-          clearTimeout(wheel.timer);
-          wheel.timer = setTimeout(() => { if (Date.now() >= wheel.lockUntil) commitWheel(); }, 140);
-        }, { passive: true });
-      });
-      $('flexibleTime').addEventListener('change', () => {
-        const flex = $('flexibleTime').checked;
-        $('timeWheel').classList.toggle('is-off', flex);
-        if (flex) {
-          if (state.time && state.time !== FLEXIBLE) wheel.lastTime = state.time; // restored when unticked
-          state.time = FLEXIBLE; $('timeSelect').value = FLEXIBLE; updateSubmitState();
-          return;
-        }
-        const labels = wheel.slots.map(clockText);
-        const back = labels.includes(wheel.lastTime) ? wheel.lastTime : labels[0];
-        if (!back) return;
-        state.time = back; $('timeSelect').value = back;
-        showSlot(labelToMin(back), false);
-        updateSubmitState();
-      });
+    // Why the picked time can't be used, or null when it's fine
+    function timeProblem() {
+      if (state.time === FLEXIBLE) return null;
+      const v = $('timeInput').value;
+      if (!v) return 'Pick a time';
+      if (!state.date) return null;
+      const t = toMin(v), w = timeWindow(state.date);
+      const day = isWeekend(state.date) ? 'weekends' : 'weekdays';
+      if (t < w.first || t > w.last) return `On ${day}, pick a start time from ${clockText(w.first)} to ${clockText(w.last)}`;
+      return null;
     }
 
     function renderTimeOptions() {
       const iso = $('sessionDateInput').value;
-      wheel.slots = slotsForDate(iso);
-      wheel.hours = [...new Set(wheel.slots.map((t) => Math.floor(t / 60)))];
-      const labels = wheel.slots.map(clockText);
-      // keep the chosen time if it still fits; otherwise start on the first available time
-      if (state.time !== FLEXIBLE && !labels.includes(state.time)) state.time = labels[0] || '';
-      const opt = (value, text) => Object.assign(document.createElement('option'), { value, textContent: text });
-      $('timeSelect').replaceChildren(...labels.map((t) => opt(t, t)), ...(iso ? [opt(FLEXIBLE, 'I’m flexible')] : []));
-      $('timeSelect').disabled = !iso;
-      $('timeSelect').value = state.time;
-      $('timeBlock').hidden = !iso;
-      $('flexibleTime').checked = state.time === FLEXIBLE;
-      $('timeWheel').classList.toggle('is-off', state.time === FLEXIBLE);
-      if (!iso) return;
-      wheel.lockUntil = Date.now() + 300;
-      ['hour', 'min'].forEach((c) => { wheel.cols[c].scrollTop = 0; });
-      wheel.minKey = '';
-      wheelItems('hour', wheel.hours.map((h) => String(((h + 11) % 12) + 1)));
-      // lay out first (the block was hidden), then position the wheel
-      requestAnimationFrame(() => showSlot(labelToMin(state.time === FLEXIBLE ? labels[0] : state.time), false));
+      const flex = $('flexibleTime').checked;
+      $('timeInput').disabled = !iso || flex;
+      if (iso) {
+        const w = timeWindow(iso);
+        $('timeInput').min = hhmm(w.first); // computers use these; iPhone/iPad ignore them, so we also check below
+        $('timeInput').max = hhmm(w.last);
+      }
       updateSubmitState();
     }
 
@@ -1325,7 +1210,8 @@
       const dateOk = state.date && state.date >= earliestBookingISO();
       if (!state.date) return 'Pick a date to continue';
       if (!dateOk) return 'Pick a date from tomorrow on';
-      if (!state.time) return 'Pick a time';
+      const tp = timeProblem();
+      if (tp) return tp.startsWith('On ') ? 'Change the time to continue' : tp;
       if (!addressOk()) return 'Add the lesson address';
       if (needsAddress() && travel.status === 'checking') return 'Checking distance…';
       if (needsAddress() && travel.status === 'far') return 'Outside my travel area';
@@ -1341,6 +1227,10 @@
 
     function updateSubmitState() {
       readContact();
+      const tp = state.date && $('timeInput').value ? timeProblem() : null;
+      $('timeError').hidden = !tp;
+      $('timeError').textContent = tp || '';
+      $('timeInput').classList.toggle('border-red-400', Boolean(tp));
       // Step 3
       const wr = whenReason();
       $('nextBtn').disabled = Boolean(wr) || !state.rate;
@@ -1514,6 +1404,7 @@
       state = initialState();
       state.instIndex = keepInst;
       $('bookingForm').reset();
+      $('flexibleTime').checked = false;
       $('sessionDateInput').min = earliestBookingISO();
       $('guardianBlock').hidden = true;
       loadSavedContact();
@@ -1702,19 +1593,14 @@
     renderFormats();
     initSlider();
     $('sessionDateInput').min = earliestBookingISO();
-    initWheel();
     renderTimeOptions();
     loadSavedContact();
     $('questionsLink').href = `mailto:${CONFIG.contactEmail}?subject=${encodeURIComponent('Question about drum lessons')}`;
     $('noteToggle').addEventListener('click', () => setNoteOpen($('clientNotes').hidden));
     $('sessionDateInput').addEventListener('input', renderTimeOptions);
-    $('timeSelect').addEventListener('change', () => {
-      state.time = $('timeSelect').value;
-      $('flexibleTime').checked = state.time === FLEXIBLE;
-      $('timeWheel').classList.toggle('is-off', state.time === FLEXIBLE);
-      if (state.time !== FLEXIBLE) showSlot(labelToMin(state.time), true);
-      updateSubmitState();
-    });
+    $('timeInput').addEventListener('input', updateSubmitState);
+    $('timeInput').addEventListener('change', updateSubmitState);
+    $('flexibleTime').addEventListener('change', renderTimeOptions);
     $('nextBtn').addEventListener('click', () => goToPage(4));
     $('forgetBtn').addEventListener('click', () => {
       try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
