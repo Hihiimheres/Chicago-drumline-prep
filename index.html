@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.20">
+  <meta name="site-version" content="2026-11-16.21">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -230,7 +230,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.20">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.21">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -612,6 +612,9 @@
      * CONFIG — edit these before going live.
      * formEndpoint: a form backend (Formspree, Getform, Basin, your own
      *   API...) that accepts a JSON POST. When set, bookings are sent there.
+     * sheetEndpoint: web address of the Google Sheet script (see google-sheet/SETUP.md).
+     *   When set, every request that reaches the email inbox is also saved as a row
+     *   in the booking sheet. Leave empty to skip.
      * contactEmail: used as a fallback when no endpoint is set — the
      *   visitor's mail app opens with the booking details pre-filled.
      * paymentLinks: one Stripe Payment Link per lesson (https://buy.stripe.com/...).
@@ -622,6 +625,7 @@
      * ------------------------------------------------------------------ */
     const CONFIG = {
       formEndpoint: 'https://formspree.io/f/xnpdpvan',
+      sheetEndpoint: '',
       contactEmail: 'Boston.drumming@icloud.com',
       // Which option the digital "Per session | Subscription" switch starts on: 'plan' or 'single'
       defaultRateMode: 'single',
@@ -1361,6 +1365,21 @@
       return fee ? `$${state.rate.price + fee} ($${state.rate.price} lesson + $${fee} travel)` : data.price;
     }
 
+    // Save a copy of the request as a row in the booking sheet (Google Apps Script web app).
+    // Fire-and-forget: the email already went out, so a sheet hiccup never blocks the student.
+    function sendToSheet(data) {
+      if (!CONFIG.sheetEndpoint) return;
+      try {
+        fetch(CONFIG.sheetEndpoint, {
+          method: 'POST',
+          mode: 'no-cors',                                   // Apps Script doesn't send CORS headers; we don't need its reply
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // keeps this a "simple" request (no preflight)
+          body: JSON.stringify({ ...data, _gotcha: $('hpField').value }),
+          keepalive: true,
+        }).catch(() => {});
+      } catch (_) {}
+    }
+
     let sending = false; // blocks a second tap while a request is on its way
 
     async function submitBooking(e) {
@@ -1396,6 +1415,7 @@
             }),
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          sendToSheet(data);
           message = state.pay === 'online'
             ? (isPlan()
               ? `🎉 Request sent! Start your plan below. You’ll be billed $${state.rate.price} each month until you cancel, and can cancel anytime.`
