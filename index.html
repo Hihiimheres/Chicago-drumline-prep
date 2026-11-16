@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.15">
+  <meta name="site-version" content="2026-11-16.16">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -164,7 +164,12 @@
     /* Phones and tablets (full-screen): the background is pinned to the screen so the waves stay
        in view while scrolling, and raised so the top wave line sits a little below the middle */
     @media (max-width: 1023px), (hover: none) and (pointer: coarse) {
-      .bg-waves { position: fixed !important; inset: 0; }
+      /* top-anchored and taller than the screen, so it keeps going under Safari's see-through
+         toolbar (iOS 26) instead of stopping above it and leaving a black strip */
+      .bg-waves { position: fixed !important; top: 0; left: 0; right: 0; bottom: auto; height: calc(100vh + 160px); height: calc(100lvh + 160px); }
+      .wave { bottom: 160px; }
+      /* anything Safari still shows past the page (toolbar area, overscroll) uses the theme's warm tone, not black */
+      html[data-theme], html[data-theme] body { background-color: color-mix(in srgb, var(--c3) 28%, #0c0808); }
       .blob   { filter: blur(70px); opacity: 0.5; }
       .blob-1 { width: 130%; left: -40%; top: -4%; }
       .blob-2 { width: 120%; right: -50%; top: 28%; }
@@ -222,7 +227,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.15">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.16">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
