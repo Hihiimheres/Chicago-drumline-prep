@@ -31,21 +31,26 @@ const SETTINGS = {
    (columns: Email | Subject | Body); a row there replaces the matching default below.
    Placeholders: {first} {lesson} {when} {time} {where} {price} {booking} {instrument} {lessonRef} {site} */
 const EMAILS = {
+  // Signature under every email: line 1 your name, line 2 your title, line 3 a tagline
+  signature: {
+    subject: '',
+    body: 'Josiah Boston\nDrumline Coach · Boston Drumming Co.\nLearn. Practice. Play.',
+  },
   confirm: {
     subject: 'Lesson confirmed: {when}',
-    body: "Hi {first},\n\nYou're booked!\n\n{lesson}\n{when}\n{where}\n{price}\n\nNeed to change or cancel? Just reply to this email. Cancel 24+ hours ahead for a full refund.\n\nBoston Drumming Co.\nBooking {booking}",
+    body: "Hi {first},\n\nYou're booked!\n\n{lesson}\n{when}\n{where}\n{price}\n\nNeed to change or cancel? Just reply to this email. Cancel 24+ hours ahead for a full refund.\n\nBooking {booking}",
   },
   decline: {
     subject: 'About your lesson request',
-    body: "Hi {first},\n\nThanks for reaching out! Unfortunately I can't make {when} work. You're welcome to pick another time: {site}\n\nBoston Drumming Co.",
+    body: "Hi {first},\n\nThanks for reaching out! Unfortunately I can't make {when} work. You're welcome to pick another time: {site}",
   },
   reminder: {
     subject: 'Reminder: lesson tomorrow at {time}',
-    body: "Hi {first},\n\nSee you tomorrow!\n\n{lesson}\n{when}\n{where}\n\nNeed to change something? Just reply to this email.\n\nBoston Drumming Co.",
+    body: "Hi {first},\n\nSee you tomorrow!\n\n{lesson}\n{when}\n{where}\n\nNeed to change something? Just reply to this email.",
   },
   cancel: {
     subject: 'Lesson cancelled: {when}',
-    body: "Hi {first},\n\nYour {lessonRef} has been cancelled. Want to reschedule? Book anytime: {site}\n\nBoston Drumming Co.",
+    body: "Hi {first},\n\nYour {lessonRef} has been cancelled. Want to reschedule? Book anytime: {site}",
   },
 };
 
@@ -346,8 +351,38 @@ function sendTemplate_(key, to, vars) {
   send_(to, fill_(t.subject, vars), fill_(t.body, vars));
 }
 
+// Every email goes out as a styled HTML email (with the signature) plus a plain-text copy
 function send_(to, subject, body) {
-  MailApp.sendEmail({ to: to, subject: subject, body: body, name: SETTINGS.businessName, replyTo: SETTINGS.replyTo });
+  const sig = template_('signature').body.split('\n').map((l) => l.trim()).filter(Boolean);
+  MailApp.sendEmail({
+    to: to, subject: subject, name: SETTINGS.businessName, replyTo: SETTINGS.replyTo,
+    body: body + '\n\n--\n' + sig.concat([SETTINGS.siteUrl, SETTINGS.replyTo]).join('\n'),
+    htmlBody: htmlEmail_(body, sig),
+  });
+}
+
+function esc_(t) {
+  return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function htmlEmail_(body, sig) {
+  const red = '#dc2626';
+  // the message: plain lines, with the site address turned into a link
+  const text = esc_(body).split(esc_(SETTINGS.siteUrl)).join('<a href="' + SETTINGS.siteUrl + '" style="color:' + red + ';">book online</a>').replace(/\n/g, '<br>');
+  const [name, title, tagline] = sig;
+  const signature =
+    '<table cellpadding="0" cellspacing="0" style="margin-top:28px;border-top:1px solid #eee;padding-top:16px;"><tr>' +
+    '<td style="vertical-align:top;padding:16px 14px 0 0;"><img src="' + SETTINGS.siteUrl + 'brand/icon-192.png" width="52" height="52" alt="Boston Drumming Co." style="display:block;border-radius:50%;"></td>' +
+    '<td style="vertical-align:top;padding-top:16px;border-left:3px solid ' + red + ';padding-left:14px;">' +
+    (name ? '<div style="font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:22px;color:#111;line-height:1.2;">' + esc_(name) + '</div>' : '') +
+    (title ? '<div style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#555;margin-top:2px;">' + esc_(title) + '</div>' : '') +
+    (tagline ? '<div style="font-family:Georgia,serif;font-style:italic;font-size:13px;color:#b45309;margin-top:4px;">' + esc_(tagline) + '</div>' : '') +
+    '<div style="font-family:Helvetica,Arial,sans-serif;font-size:13px;margin-top:6px;">' +
+    '<a href="' + SETTINGS.siteUrl + '" style="color:' + red + ';text-decoration:none;font-weight:bold;">Book a lesson</a>' +
+    ' <span style="color:#bbb;">&middot;</span> ' +
+    '<a href="mailto:' + SETTINGS.replyTo + '" style="color:' + red + ';text-decoration:none;">' + esc_(SETTINGS.replyTo) + '</a>' +
+    '</div></td></tr></table>';
+  return '<div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#222;max-width:560px;">' + text + signature + '</div>';
 }
 
 /* ---------------- Helpers ---------------- */

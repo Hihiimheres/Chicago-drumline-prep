@@ -42,7 +42,7 @@ You only need `setup` once. If the Sheet already has the Requests tab with heade
 
 ## Changing things later
 
-- Wording of the student emails: the **Emails** tab in the Sheet (Subject and Body per email; `{first}`, `{when}` and the other words in braces are filled in). No code changes needed. If the tab is missing, the built-in wording in `EMAILS` at the top of `Code.gs` is used.
+- Wording of the student emails and the signature under them (row `signature`: name, title, tagline on three lines): the **Emails** tab in the Sheet (Subject and Body per email; `{first}`, `{when}` and the other words in braces are filled in). No code changes needed. If the tab is missing, the built-in wording in `EMAILS` at the top of `Code.gs` is used.
 - The reminder time and your reply-to address: the `SETTINGS` block at the top of `Code.gs`.
 - After editing `Code.gs`: **Deploy > Manage deployments > pencil > Version: New version > Deploy**. The web address stays the same.
 - Emails come from your Google account (free accounts can send about 100 a day, far more than you need).
