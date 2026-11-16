@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-16.2">
+  <meta name="site-version" content="2026-11-16.3">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" href="brand/logo-mark.png">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
@@ -138,15 +138,24 @@
     .wave-3 path { fill: var(--c2); }
     @keyframes waveFlow { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-    /* Phones: the card is tall and narrow, so size colour by height instead of width */
-    @media (max-width: 1023px) {
+    /* Phones and tablets (full-screen): the background is pinned to the screen so the waves stay
+       in view while scrolling, and raised so the top wave line sits a little below the middle */
+    @media (max-width: 1023px), (hover: none) and (pointer: coarse) {
+      .bg-waves { position: fixed !important; inset: 0; }
       .blob   { filter: blur(70px); opacity: 0.5; }
       .blob-1 { width: 130%; left: -40%; top: -4%; }
       .blob-2 { width: 120%; right: -50%; top: 28%; }
       .blob-3 { width: 140%; left: -20%; bottom: -8%; }
-      .wave-1 { height: 380px; width: 400%; }
-      .wave-2 { height: 290px; width: 400%; }
-      .wave-3 { height: 200px; width: 400%; }
+      .wave-1 { height: 46vh; height: 46svh; width: 400%; }
+      .wave-2 { height: 36vh; height: 36svh; width: 400%; }
+      .wave-3 { height: 25vh; height: 25svh; width: 400%; }
+    }
+    /* Wide touch tablets: the waves don't need to be stretched as far */
+    @media (min-width: 1024px) and (hover: none) and (pointer: coarse) {
+      .blob-1 { width: 55%; left: -10%; top: -20%; }
+      .blob-2 { width: 50%; right: -12%; top: 10%; }
+      .blob-3 { width: 60%; left: 25%; bottom: -35%; }
+      .wave-1, .wave-2, .wave-3 { width: 200%; }
     }
 
     /* Fade-in for the booking step being shown (hidden steps use the `hidden` attribute,
@@ -181,7 +190,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.2">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-16.3">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
