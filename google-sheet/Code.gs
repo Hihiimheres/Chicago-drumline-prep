@@ -366,23 +366,25 @@ function esc_(t) {
 }
 
 function htmlEmail_(body, sig) {
-  const red = '#dc2626';
+  // Soft, muted versions of the site's colours
+  const link = '#b85c55', accent = '#e8c4bf', gold = '#a8834f', grey = '#6b6b6b';
   // the message: plain lines, with the site address turned into a link
-  const text = esc_(body).split(esc_(SETTINGS.siteUrl)).join('<a href="' + SETTINGS.siteUrl + '" style="color:' + red + ';">book online</a>').replace(/\n/g, '<br>');
+  const text = esc_(body).split(esc_(SETTINGS.siteUrl)).join('<a href="' + SETTINGS.siteUrl + '" style="color:' + link + ';">book online</a>').replace(/\n/g, '<br>');
   const [name, title, tagline] = sig;
+  const font = 'font-family:Helvetica,Arial,sans-serif;';
   const signature =
-    '<table cellpadding="0" cellspacing="0" style="margin-top:28px;border-top:1px solid #eee;padding-top:16px;"><tr>' +
-    '<td style="vertical-align:top;padding:16px 14px 0 0;"><img src="' + SETTINGS.siteUrl + 'brand/icon-192.png" width="52" height="52" alt="Boston Drumming Co." style="display:block;border-radius:50%;"></td>' +
-    '<td style="vertical-align:top;padding-top:16px;border-left:3px solid ' + red + ';padding-left:14px;">' +
-    (name ? '<div style="font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:22px;color:#111;line-height:1.2;">' + esc_(name) + '</div>' : '') +
-    (title ? '<div style="font-family:Helvetica,Arial,sans-serif;font-size:13px;color:#555;margin-top:2px;">' + esc_(title) + '</div>' : '') +
-    (tagline ? '<div style="font-family:Georgia,serif;font-style:italic;font-size:13px;color:#b45309;margin-top:4px;">' + esc_(tagline) + '</div>' : '') +
-    '<div style="font-family:Helvetica,Arial,sans-serif;font-size:13px;margin-top:6px;">' +
-    '<a href="' + SETTINGS.siteUrl + '" style="color:' + red + ';text-decoration:none;font-weight:bold;">Book a lesson</a>' +
-    ' <span style="color:#bbb;">&middot;</span> ' +
-    '<a href="mailto:' + SETTINGS.replyTo + '" style="color:' + red + ';text-decoration:none;">' + esc_(SETTINGS.replyTo) + '</a>' +
+    '<table cellpadding="0" cellspacing="0" style="margin-top:24px;border-top:1px solid #eee;"><tr>' +
+    '<td style="vertical-align:top;padding:14px 12px 0 0;"><img src="' + SETTINGS.siteUrl + 'brand/icon-192.png" width="36" height="36" alt="Boston Drumming Co." style="display:block;border-radius:50%;"></td>' +
+    '<td style="vertical-align:top;padding:14px 0 0 12px;border-left:2px solid ' + accent + ';">' +
+    (name ? '<div style="font-family:Georgia,\'Times New Roman\',serif;font-style:italic;font-size:16px;color:#2b2b2b;line-height:1.2;">' + esc_(name) + '</div>' : '') +
+    (title ? '<div style="' + font + 'font-size:11.5px;color:' + grey + ';margin-top:2px;">' + esc_(title) + '</div>' : '') +
+    (tagline ? '<div style="font-family:Georgia,serif;font-style:italic;font-size:11.5px;color:' + gold + ';margin-top:2px;">' + esc_(tagline) + '</div>' : '') +
+    '<div style="' + font + 'font-size:11.5px;margin-top:5px;">' +
+    '<a href="' + SETTINGS.siteUrl + '" style="color:' + link + ';text-decoration:none;font-weight:600;">Book a lesson</a>' +
+    ' <span style="color:#ccc;">&middot;</span> ' +
+    '<a href="mailto:' + SETTINGS.replyTo + '" style="color:' + link + ';text-decoration:none;">' + esc_(SETTINGS.replyTo) + '</a>' +
     '</div></td></tr></table>';
-  return '<div style="font-family:Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#222;max-width:560px;">' + text + signature + '</div>';
+  return '<div style="' + font + 'font-size:15px;line-height:1.5;color:#222;max-width:560px;">' + text + signature + '</div>';
 }
 
 /* ---------------- Helpers ---------------- */
