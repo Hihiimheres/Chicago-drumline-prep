@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-17.1">
+  <meta name="site-version" content="2026-11-17.2">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -230,7 +230,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.1">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.2">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -246,7 +246,7 @@
         <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">📅</span><span><strong class="font-semibold text-white">Weekly plans:</strong> billed monthly for 4 lessons. Cancel anytime from <a class="text-red-300 underline" href="https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00" target="_blank" rel="noopener">your plan page</a>; your plan runs to the end of the month you’ve paid for, and that month isn’t refunded.</span></li>
-        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 20 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
+        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 15 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
       </ul>
@@ -468,7 +468,7 @@
                     <input type="text" id="clientZip" autocomplete="postal-code" inputmode="numeric" maxlength="10" placeholder="ZIP" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none" />
                   </div>
                 </div>
-                <p class="text-xs text-stone-400">I travel up to 20 driving miles. Free within 10 miles, then $1 per mile.</p>
+                <p class="text-xs text-stone-400">I travel up to 15 driving miles. Free within 10 miles, then $1 per mile.</p>
                 <div id="travelInfo" role="status" aria-live="polite" class="text-sm rounded-xl px-3 py-2 border border-white/10 bg-white/[0.03] text-stone-300" hidden></div>
               </fieldset>
 
@@ -696,7 +696,7 @@
       origin: [41.776, -87.6674],   // centre of ZIP 60636
       freeMiles: 10,                // no fee up to here
       perMile: 1,                   // $ per mile after freeMiles
-      maxMiles: 20,                 // farthest I travel
+      maxMiles: 15,                 // farthest I travel (fee tops out at $5)
       roadFactor: 1.25,             // straight-line -> rough driving estimate
     };
     // ZIP code centres within ~45 miles (US Census ZCTA data via the "zipcodes" package)
