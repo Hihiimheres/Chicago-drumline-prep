@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="description" content="Private drumline lessons in Chicagoland and online: snare, tenors, bass and cymbals from a coach with 3 years of marching experience. From $20. Book online in under a minute.">
+  <meta name="description" content="Online drumline lessons over Zoom or FaceTime: snare, tenors, bass and cymbals from a coach with 3 years of marching experience. From $20. In-person lessons in Chicagoland coming soon.">
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-17.3">
+  <meta name="site-version" content="2026-11-17.4">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
   <link rel="apple-touch-icon" href="brand/apple-touch-icon.png">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Boston Drumming Co. — Learn. Practice. Play.">
-  <meta property="og:description" content="Snare, tenor, bass and cymbal lessons in Chicagoland and online. Book a session in under a minute.">
+  <meta property="og:description" content="Online snare, tenor, bass and cymbal lessons over Zoom or FaceTime. Book a session in under a minute.">
   <meta property="og:url" content="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta property="og:image" content="https://hihiimheres.github.io/Chicago-drumline-prep/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -28,12 +28,12 @@
     "@type": "MusicSchool",
     "name": "Boston Drumming Co.",
     "slogan": "Learn. Practice. Play.",
-    "description": "Private drumline lessons (snare, tenors, bass, cymbals) in the Chicagoland area and online over Zoom or FaceTime.",
+    "description": "Online drumline lessons (snare, tenors, bass, cymbals) over Zoom or FaceTime. In-person lessons in the Chicagoland area coming soon.",
     "url": "https://hihiimheres.github.io/Chicago-drumline-prep/",
     "logo": "https://hihiimheres.github.io/Chicago-drumline-prep/brand/logo-mark.png",
     "image": "https://hihiimheres.github.io/Chicago-drumline-prep/og-image.png",
     "email": "Boston.drumming@icloud.com",
-    "priceRange": "$20–$55",
+    "priceRange": "$20–$40",
     "areaServed": [
       {
         "@type": "City",
@@ -70,24 +70,6 @@
         "itemOffered": {
           "@type": "Service",
           "name": "Digital drumline lesson, 90 min"
-        }
-      },
-      {
-        "@type": "Offer",
-        "price": "40",
-        "priceCurrency": "USD",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "In-person drumline lesson, 60 min"
-        }
-      },
-      {
-        "@type": "Offer",
-        "price": "55",
-        "priceCurrency": "USD",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "In-person drumline lesson, 90 min (Audition Block)"
         }
       },
       {"@type": "Offer", "price": "72", "priceCurrency": "USD", "itemOffered": {"@type": "Service", "name": "Weekly digital drumline lessons, 30 min (4 per month)"}},
@@ -230,7 +212,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.3">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.4">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -246,7 +228,7 @@
         <li class="flex gap-3"><span aria-hidden="true">⏰</span><span>Cancellations made less than 24 hours before the lesson aren’t refunded.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">🔁</span><span><strong class="font-semibold text-white">If I can’t make your lesson</strong> on the scheduled day, we’ll reschedule it for a time that works for you.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">📅</span><span><strong class="font-semibold text-white">Weekly plans:</strong> billed monthly for 4 lessons. Cancel anytime from <a class="text-red-300 underline" href="https://billing.stripe.com/p/login/14A28rddm9lH6UM3gyasg00" target="_blank" rel="noopener">your plan page</a>; your plan runs to the end of the month you’ve paid for, and that month isn’t refunded.</span></li>
-        <li class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 15 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
+        <li data-inperson-only class="flex gap-3"><span aria-hidden="true">🚗</span><span><strong class="font-semibold text-white">In-person travel:</strong> free within 10 driving miles, then $1 per mile, up to 15 miles. The travel fee is added to your online payment, or paid at the lesson if you pay in person.</span></li>
         <li class="flex gap-3"><span aria-hidden="true">✉️</span><span>To cancel, email <a class="text-red-300 underline" href="mailto:Boston.drumming@icloud.com">Boston.drumming@icloud.com</a> with your booking number (for example BD-1205-K7Q2).</span></li>
         <li class="flex gap-3"><span aria-hidden="true">💳</span><span>Refunds go back to the card or account you paid with, usually within 5–10 business days.</span></li>
       </ul>
@@ -626,6 +608,9 @@
      * ------------------------------------------------------------------ */
     const CONFIG = {
       formEndpoint: 'https://formspree.io/f/xnpdpvan',
+      // In-person lessons: false = online only, with an "In-person coming soon" waitlist on step 1.
+      // Set to true to offer them again (prices, travel fee and Stripe links below stay ready).
+      inPersonEnabled: false,
       sheetEndpoint: 'https://script.google.com/macros/s/AKfycbyZOyh7jh_K1-ufbwDOZlyAIXnDZuEtD6U-EjhJGXM9PUvHig6Ft4YbmrO88UiZMbSa/exec',
       contactEmail: 'Boston.drumming@icloud.com',
       // Which option the digital "Per session | Subscription" switch starts on: 'plan' or 'single'
@@ -860,6 +845,7 @@
     function renderFormats() {
       const container = $('formatButtonsContainer');
       Object.entries(formats).forEach(([key, f]) => {
+        if (key === 'inperson' && !CONFIG.inPersonEnabled) return;
         const from = Math.min(...f.rates.map((r) => r.price));
         const btn = el('button', 'w-full text-left p-4 rounded-2xl border border-white/10 bg-white/[0.03] hover:border-red-400/60 transition flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3 group');
         btn.type = 'button';
@@ -875,6 +861,66 @@
         btn.addEventListener('click', () => chooseFormat(key));
         container.append(btn);
       });
+      if (!CONFIG.inPersonEnabled) container.append(waitlistCard());
+    }
+
+    /* In-person "coming soon" card with a short waitlist form (sent like a booking request, by email) */
+    function waitlistCard() {
+      const card = el('div', 'p-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.02] space-y-3');
+      const head = el('div', 'flex items-center justify-between gap-3');
+      const text = el('div', 'min-w-0');
+      text.append(
+        el('span', 'text-sm font-bold text-stone-300 block', '🤝 In-person (Chicagoland)'),
+        el('span', 'text-[11px] block mt-0.5 text-stone-400', 'Coming soon. Join the waitlist and I’ll let you know first.'),
+      );
+      const open = el('button', 'shrink-0 text-xs font-bold text-amber-200 bg-amber-400/10 px-3 py-1.5 rounded-full border border-amber-400/30', 'Join waitlist');
+      open.type = 'button';
+      head.append(text, open);
+      const form = el('form', 'grid gap-2');
+      form.hidden = true;
+      form.noValidate = true;
+      const input = (id, ph, type, auto) => {
+        const i = el('input', 'w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none');
+        i.id = id; i.placeholder = ph; i.type = type; i.autocomplete = auto;
+        const l = el('label', 'sr-only', ph); l.htmlFor = id;
+        form.append(l, i);
+        return i;
+      };
+      const name = input('wlName', 'Your name', 'text', 'name');
+      const contact = input('wlContact', 'Email or phone', 'text', 'email');
+      const zip = input('wlZip', 'ZIP code', 'text', 'postal-code');
+      zip.inputMode = 'numeric';
+      const msg = el('p', 'text-xs text-stone-400');
+      const send = el('button', 'w-full py-3 rounded-full btn-accent font-bold text-xs uppercase tracking-wider', 'Join the waitlist');
+      send.type = 'submit';
+      form.append(send, msg);
+      open.addEventListener('click', () => { form.hidden = !form.hidden; open.textContent = form.hidden ? 'Join waitlist' : 'Close'; if (!form.hidden) name.focus(); });
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const c = contact.value.trim();
+        if (!name.value.trim() || !(isValidEmail(c) || isValidPhone(c))) { msg.textContent = 'Add your name and an email or phone number.'; return; }
+        send.disabled = true; send.textContent = 'Sending…';
+        try {
+          const res = await fetch(CONFIG.formEndpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              form: 'in-person waitlist', name: name.value.trim(), contact: c, zip: zip.value.trim(),
+              instrument: instruments[state.instIndex],
+              ...(isValidEmail(c) ? { email: c } : {}),
+              _subject: `In-person waitlist: ${name.value.trim()}${zip.value.trim() ? ' (' + zip.value.trim() + ')' : ''}`,
+            }),
+          });
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          form.replaceChildren(el('p', 'text-sm text-emerald-200', '✅ You’re on the list. I’ll reach out when in-person lessons open.'));
+          open.hidden = true;
+        } catch (_) {
+          send.disabled = false; send.textContent = 'Join the waitlist';
+          msg.textContent = 'Couldn’t send. Check your connection and try again.';
+        }
+      });
+      card.append(head, form);
+      return card;
     }
 
     function chooseFormat(key) {
@@ -1668,6 +1714,7 @@
     }
 
     /* ---------------- Wire up ---------------- */
+    if (!CONFIG.inPersonEnabled) document.querySelectorAll('[data-inperson-only]').forEach((n) => { n.hidden = true; });
     renderFormats();
     initSlider();
     $('sessionDateInput').min = earliestBookingISO();
