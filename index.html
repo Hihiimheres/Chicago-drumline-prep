@@ -7,7 +7,7 @@
   <link rel="canonical" href="https://hihiimheres.github.io/Chicago-drumline-prep/">
   <meta name="theme-color" content="#100B0B">
   <!-- Bump on every update: open pages compare this with the published copy and refresh -->
-  <meta name="site-version" content="2026-11-17.4">
+  <meta name="site-version" content="2026-11-17.5">
   <link rel="icon" type="image/svg+xml" href="brand/logo-mark.svg">
   <link rel="icon" type="image/png" sizes="48x48" href="brand/favicon-48.png">
   <link rel="manifest" href="site.webmanifest">
@@ -212,7 +212,7 @@
   </style>
 
   <!-- Tailwind styles, built from this page. After changing classes in index.html, run: npm run build:css -->
-  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.4">
+  <link rel="stylesheet" href="assets/site.css?v=2026-11-17.5">
 </head>
 <body class="min-h-screen w-full text-[#F5EFE6] font-sans-custom antialiased p-0 lg:p-8 flex items-center justify-center bg-[#050404]">
 
@@ -221,7 +221,7 @@
     <div class="p-6 sm:p-7 space-y-4">
       <div class="flex items-start justify-between gap-4">
         <h2 id="policyTitle" class="font-serif-custom text-3xl leading-none">Cancellation &amp; refunds</h2>
-        <button type="button" id="policyClose" class="text-stone-400 hover:text-white text-2xl leading-none -mt-1" aria-label="Close">×</button>
+        <button type="button" id="policyClose" class="text-stone-400 hover:text-white text-2xl leading-none -mt-3 -mr-3 p-3" aria-label="Close">×</button>
       </div>
       <ul class="space-y-3 text-sm text-stone-200 font-light leading-relaxed">
         <li class="flex gap-3"><span aria-hidden="true">✅</span><span><strong class="font-semibold text-white">Cancel at least 24 hours before your lesson</strong> and you’ll get a full refund.</span></li>
@@ -241,7 +241,7 @@
     <form id="reviewForm" class="p-6 sm:p-7 space-y-4" novalidate>
       <div class="flex items-start justify-between gap-4">
         <h2 id="reviewTitle" class="font-serif-custom text-3xl leading-none">Leave a review</h2>
-        <button type="button" data-close-dialog class="text-stone-400 hover:text-white text-2xl leading-none -mt-1" aria-label="Close">×</button>
+        <button type="button" data-close-dialog class="text-stone-400 hover:text-white text-2xl leading-none -mt-3 -mr-3 p-3" aria-label="Close">×</button>
       </div>
       <div id="reviewFields" class="space-y-3">
         <fieldset>
@@ -415,7 +415,7 @@
 
               <div>
                 <label for="sessionDateInput" id="dateLabel" class="text-xs uppercase tracking-wider text-stone-400 font-semibold block mb-1.5">Preferred date &amp; time</label>
-                <div class="grid grid-cols-[minmax(0,1fr)_9.5rem] sm:grid-cols-[minmax(0,1fr)_11rem] gap-2">
+                <div class="grid grid-cols-[minmax(0,1fr)_9.5rem] max-[379px]:grid-cols-1 sm:grid-cols-[minmax(0,1fr)_11rem] gap-2">
                   <div class="relative min-w-0">
                     <input type="date" id="sessionDateInput" required aria-describedby="availHint" class="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none min-h-[3.25rem]" />
                     <span data-empty-hint="sessionDateInput" class="absolute left-4 top-1/2 -translate-y-1/2 text-base text-stone-500 pointer-events-none" aria-hidden="true">Pick a date</span>
@@ -509,7 +509,7 @@
               </div>
 
               <div>
-                <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-sm text-red-300 hover:underline">+ Add a note (experience, goals, audition date)</button>
+                <button type="button" id="noteToggle" aria-expanded="false" aria-controls="clientNotes" class="text-sm text-red-300 hover:underline py-2">+ Add a note (experience, goals, audition date)</button>
                 <label for="clientNotes" class="sr-only">Note for your coach</label>
                 <textarea id="clientNotes" rows="3" maxlength="500" hidden placeholder="e.g. 2 years on snare, auditioning for a college line in March" class="mt-2 w-full px-4 py-3 rounded-xl bg-black/50 border border-white/15 text-base text-[#FDFBF7] placeholder:text-stone-500 focus:border-red-400 focus:outline-none resize-none"></textarea>
               </div>
@@ -521,8 +521,8 @@
                 <button type="submit" id="submitBtn" data-pay="online" disabled class="w-full py-4 rounded-full btn-accent font-bold text-sm uppercase tracking-wider shadow-lg disabled:opacity-35 disabled:cursor-not-allowed transition transform active:scale-[0.98]">Add your first and last name</button>
                 <button type="submit" id="submitLessonBtn" data-pay="lesson" class="w-full py-4 rounded-full border border-white/20 bg-white/[0.04] hover:border-amber-300/60 text-[#F7F2DC] font-bold text-sm uppercase tracking-wider transition transform active:scale-[0.98]" hidden>Request · pay at the lesson</button>
               </div>
-              <p class="text-xs text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white">See policy</button></p>
-              <p class="text-[11px] text-stone-500 text-center">Your details are remembered on this device for next time. <button type="button" id="forgetBtn" class="underline hover:text-stone-300">Forget them</button></p>
+              <p class="text-xs text-stone-400 text-center">Full refund if you cancel at least 24 hours before your lesson. <button type="button" data-open-policy class="underline text-stone-300 hover:text-white py-1.5">See policy</button></p>
+              <p class="text-[11px] text-stone-500 text-center">Your details are remembered on this device for next time. <button type="button" id="forgetBtn" class="underline hover:text-stone-300 py-1.5">Forget them</button></p>
               <p id="submitError" class="hidden text-sm text-red-300 text-center" role="alert"></p>
             </div>
             </form>
@@ -681,7 +681,7 @@
       digital: {
         icon: '💻',
         title: 'Digital (Zoom / FaceTime)',
-        label: 'Digital (Zoom/FaceTime)',
+        label: 'Digital (Zoom / FaceTime)',
         note: 'Online payment required',
         noteClass: 'text-red-300/80',
         page2Title: 'Digital length (online payment):',
@@ -953,11 +953,11 @@
         sw.append(knob);
         const modes = [['single', 'Per session', ''], ['plan', 'Subscription', 'Save 10%']];
         const pills = modes.map(([mode, text, badge]) => {
-          const b = el('button', 'relative z-10 py-2.5 rounded-full text-[13px] font-semibold transition-colors duration-300');
+          const b = el('button', 'relative z-10 py-2.5 px-2 rounded-full text-[13px] leading-tight font-semibold transition-colors duration-300 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5');
           b.type = 'button';
           b.dataset.rateMode = mode;
           b.append(text);
-          if (badge) b.append(el('span', 'ml-1.5 px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold align-middle transition-colors duration-300', badge));
+          if (badge) b.append(el('span', 'px-1.5 py-0.5 rounded-full bg-amber-400/20 text-amber-200 text-[10px] font-bold whitespace-nowrap transition-colors duration-300', badge));
           b.addEventListener('click', () => showMode(mode));
           sw.append(b);
           return b;
@@ -1345,7 +1345,7 @@
       const nameOk = state.first && state.last;
       const guardianOk = !state.minor || (state.guardianName.length >= 2 && isValidPhone(state.guardianPhone));
       const detailsReason = !nameOk ? 'Add your first and last name'
-        : problem ? 'Add email or phone to continue'
+        : problem ? (touched ? 'Check your email or phone' : 'Add email or phone to continue')
         : !guardianOk ? 'Add a parent or guardian name and phone'
         : null;
       const ready = state.format && state.rate && !wr && !detailsReason;
@@ -1736,6 +1736,11 @@
     $('timeInput').addEventListener('change', updateSubmitState);
     $('flexibleTime').addEventListener('change', renderTimeOptions);
     $('nextBtn').addEventListener('click', () => goToPage(4));
+    $('page3').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' || e.target.tagName === 'TEXTAREA' || e.target.type === 'checkbox') return;
+      e.preventDefault();
+      if (!$('nextBtn').disabled) goToPage(4);
+    });
     $('forgetBtn').addEventListener('click', () => {
       try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
       ['clientFirst', 'clientLast', 'clientEmail', 'clientPhone', 'clientStreet', 'clientCity', 'clientZip'].forEach((id) => { $(id).value = ''; });
