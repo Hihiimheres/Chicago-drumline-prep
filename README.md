@@ -1,6 +1,6 @@
 # Boston Drumming Co. — booking site
 
-Live site: https://hihiimheres.github.io/Chicago-drumline-prep/ (GitHub Pages, served from `main`).
+Live site: https://bostondrumming.com/ (GitHub Pages, served from `main`; the domain is registered at Cloudflare, and the `CNAME` file tells GitHub Pages to serve it. The old hihiimheres.github.io/Chicago-drumline-prep address forwards here).
 
 ## What's here
 
