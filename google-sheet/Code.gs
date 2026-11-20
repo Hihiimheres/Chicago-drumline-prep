@@ -23,7 +23,7 @@ const SETTINGS = {
   reminderMinutes: 60,                      // pop-up reminder before each lesson
   colourInPerson: 'GREEN',                  // calendar colours: GREEN, BLUE, RED, ORANGE, YELLOW, MAUVE, CYAN, GRAY,
   colourDigital: 'BLUE',                    //   PALE_GREEN, PALE_BLUE, PALE_RED
-  siteUrl: 'https://hihiimheres.github.io/Chicago-drumline-prep/',
+  siteUrl: 'https://bostondrumming.com/',
   reminderHour: 17,                         // reminder emails go out around this hour (24h clock) the day before
 };
 

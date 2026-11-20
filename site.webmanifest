@@ -1,7 +1,7 @@
 {
   "name": "Boston Drumming Co.",
   "short_name": "Boston Drumming",
-  "description": "Drumline lessons in Chicagoland and online. Learn. Practice. Play.",
+  "description": "Online drumline lessons over Zoom or FaceTime. Learn. Practice. Play.",
   "start_url": "./",
   "scope": "./",
   "display": "browser",
